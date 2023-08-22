@@ -78,22 +78,12 @@ $(document).ready(function(){
           }
         
           upgrade_subsp().then(function (_) {
-            $("#go-premium-modal").modal("hide");
-            $("#go-premium-modal").find('.btn_upgrade').removeClass("is-loading");
-            $("#go-premium-modal").find('.btn_upgrade').prop("disabled", false);
-
-            $("#li_go_premium").modal("hide");
-            $("#li_go_premium").find('.li_go_premium').removeClass("is-loading");
-            $("#li_go_premium").find('.li_go_premium').prop("disabled", false);
-
           }).catch(function (error) {
               showInfoModal('Error!', '<p>Something went wrong, please try again later.</p>')
           });
         });
       }
 })
-
-  
   
   var firebaseConfig = {
     apiKey: "AIzaSyClFi6oYdwKrbbTYBSNRdbYmLXJ4uR-vHI",
@@ -119,7 +109,7 @@ $(document).ready(function(){
   var totalNews=0;
 
   var myInterval;
-  var interval_delay = 1000;
+  var interval_delay = 60000;
   var is_interval_running = false; //Optional
   var is_active = false;
  
@@ -822,7 +812,7 @@ $(document).ready(function(){
     
     readAllNotifications();
     $(this).removeClass('new-notification').addClass('earlier-notification');
-    $('#notifications-count').css('background','#808080');
+    $('#notifications-count').css('background','#800080');
   });
   
   // on notification clicked

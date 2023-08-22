@@ -2,6 +2,7 @@ from pyexpat.errors import messages
 from django import forms
 from django.contrib import admin
 from django.utils.safestring import mark_safe
+from engage.account.models import User
 from engage.account.models import UserGameLinkedAccount
 from jet.admin import CompactInline
 from . import models
@@ -13,7 +14,7 @@ from django.db.models import F, Q
 from django.contrib import messages as messagesss
 from django.forms.widgets import HiddenInput
 from django.core.exceptions import ValidationError
-from ..tournament.models import get_prize
+from ..tournament.models import TournamentParticipant, get_prize
 from parler.admin import TranslatableAdmin
 from parler.admin import TranslatableTabularInline, TranslatableInlineModelAdmin, TranslatableStackedInline, TranslatableModelMixin, TranslatableModelForm, TranslatableBaseInlineFormSet
 
@@ -21,7 +22,7 @@ from parler.utils.context import switch_language
 from django.forms.models import inlineformset_factory
 from django.conf import settings
 from django.forms.widgets import TextInput
-
+from django.forms.models import BaseInlineFormSet
 
 
 class TournamentPrizeInlineForm(TranslatableModelForm): #forms.ModelForm
@@ -93,15 +94,31 @@ class TournamentPrizeInline(CompactInline): #TranslatableStackedInline
             formfield.widget.can_change_related = False
             formfield.widget.can_delete_related = False
         return formfield
-   
+
+class CustomTournamentParticipantForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        mobile_number = self.cleaned_data.get('mobile_number')
+        participant_id = User.objects.filter(mobile=mobile_number).values_list('participant', flat=True).first()
+        if participant_id:
+            participant = User.objects.get(id=participant_id)
+            self.instance.participant = participant
+        return super().save(commit=commit)
+    
+    class Meta:
+        model = TournamentParticipant
+        fields = '__all__'
 
 class TournamentParticipantInline(CompactInline): #TranslatableStackedInline
     model = models.TournamentParticipant
     # readonly_fields = ('points', 'rank')
-    exclude = ('notify_before_game', 'prize','points', 'rank', 'matches_informed')
+    exclude = ('notify_before_game', 'prize','points', 'rank', 'matches_informed','participant')
     min_num = 0
     extra = 0
     tournament = None
+    formset = CustomTournamentParticipantForm    
 #     def get_fields(self, request, obj=None):
 #         fields = list(super().get_fields(request, obj=obj))
 #         if obj is None:
@@ -192,28 +209,56 @@ class TournamentParticipantInline(CompactInline): #TranslatableStackedInline
         if obj:
             self.tournament = obj
         return super().get_formset(request, obj, **kwargs)
-
+    
     def clean(self):
         cleaned_data = super().clean()
         # Get the selected User instance from the form data
-        participant_id = cleaned_data.get('participant')
+        mobile_number = cleaned_data.get('mobile_number')
+        participant_id = models.User.objects.filter(mobile=mobile_number).values_list('participant', flat=True).first()
         if participant_id:
             participant = models.User.objects.get(id=participant_id)
-        
             # Set the MSISDN value for the participant field
             msisdn_value = participant.mobile
             print("msisdn_value ",msisdn_value)
             self.cleaned_data['participant'] = f"{participant} ({msisdn_value})"
         return self.cleaned_data
+
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     # Get the selected User instance from the form data
+    #     participant_id = cleaned_data.get('participant')
+    #     if participant_id:
+    #         participant = models.User.objects.get(id=participant_id)
+        
+    #         # Set the MSISDN value for the participant field
+    #         msisdn_value = participant.mobile
+    #         print("msisdn_value ",msisdn_value)
+    #         self.cleaned_data['participant'] = f"{participant} ({msisdn_value})"
+    #     return self.cleaned_data
+
+    #old function before adding mobile number to the tournament participant tab in cms 
+    # def clean(self):
+    #     super().clean()
+    #     for form in self.forms:
+    #         participant_id = form.cleaned_data.get('participant')
+    #         if participant_id:
+    #             # Retrieve the MSISDN value for the selected participant
+    #             msisdn = models.User.objects.filter(id=participant_id).values_list('msisdn', flat=True).first()
+    #             form.cleaned_data['participant'] = f'{participant_id} ({msisdn})'
     
+    
+
+    #new function after adding mobile number to the tournament participant tab in cms
     def clean(self):
         super().clean()
         for form in self.forms:
-            participant_id = form.cleaned_data.get('participant')
-            if participant_id:
-                # Retrieve the MSISDN value for the selected participant
-                msisdn = models.User.objects.filter(id=participant_id).values_list('msisdn', flat=True).first()
-                form.cleaned_data['participant'] = f'{participant_id} ({msisdn})'
+            mobile_number = form.cleaned_data.get('mobile_number')
+            if mobile_number:
+                # Retrieve the participant id  value from  the  mobile number
+                participant_id = models.User.objects.filter(mobile=mobile_number).values_list('participant', flat=True).first()
+                form.cleaned_data['participant'] = f'{participant_id} ({mobile_number})'
+    
 
     # def has_change_permission(self, request, obj=None):
     #     if not obj:
@@ -348,8 +393,8 @@ class TournamentMatchInline(CompactInline): #TranslatableStackedInline
                 # matches = models.TournamentMatch.objects.filter(tournament=self.tournament.id).values_list('pk', flat=True)
                 # formfield.queryset = formfield.queryset.filter(participanto__in=matches)
                 #print("values before=",formfield.queryset.values_list('pk', flat=True))
-                formfield.queryset = formfield.queryset.filter(tournamentparticipant__tournament=self.tournament.id) \
-                .filter(tournamentparticipant__status="accepted").filter(is_staff=False).filter(tournamentparticipant__is_waiting_list=False)
+                formfield.queryset = formfield.queryset.filter(__tournament=self.tournament.id) \
+                .filter(__status="accepted").filter(is_staff=False).filter(tournamentparticipant__is_waiting_list=False)
                 combined_query = formfield.queryset.annotate(
                     # tourn = Cast(Subquery(subquery.values('tournament')[:1]), output_field=TextField()),
                     gnickname = Cast(Subquery(subquery.values('account')[:1]), output_field=TextField())
@@ -380,6 +425,12 @@ class TournamentAdmin(TranslatableAdmin): #admin.ModelAdmin  #TranslatableAdmin
     list_display = ('name', 'game', 'start_date', 'end_date', 'start', 'close')
     exclude = ('slug', 'job_id', 'created_by', 'format')
     inlines = [TournamentMatchInline, TournamentPrizeInline,] #TournamentParticipantInline,]
+    
+    def get_formset(self, request, obj=None, **kwargs):
+        formset = super().get_formset(request, obj, **kwargs)
+        formset.form = TournamentParticipantInlineFormSet
+        return formset
+    
 
     def change_view(self, request, object_id, extra_context=None):
         extra_context = extra_context or {}
@@ -417,9 +468,9 @@ class TournamentAdmin(TranslatableAdmin): #admin.ModelAdmin  #TranslatableAdmin
     def formfield_for_dbfield(self, db_field, request, **kwargs):
         formfield = super().formfield_for_dbfield(
             db_field, request, **kwargs)
-        #self.patch_translation_field(db_field, formfield, **kwargs)
-        return formfield
-            
+
+
+
         # if self.tournament is not None and self.tournament.state != "upcoming" and formfield is not None:
         #     formfield.disabled = True
         
@@ -433,6 +484,6 @@ class TournamentAdmin(TranslatableAdmin): #admin.ModelAdmin  #TranslatableAdmin
         css = { 'all': ('admin/tournament/bootstrap-4.5.2.min.css', 'css/bootstrap-multiselect.css', 'css/tournament.css')} # 
         js = ('admin/tournament/select2.min.js', 'admin/tournament/bootstrap-multiselect.js', 'admin/tournament/base.js','admin/tournament/moment.min.js', ) # 'admin/tournament/select2.min.js', # 'js/bootstrap-multiselect.js', , 'admin/tournament/select2.multi-checkboxes.js'
     
-    group_fieldsets = True
-#admin.site.register(models.Tournament, TournamentAdmin)
+
+
         

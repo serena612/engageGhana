@@ -192,7 +192,8 @@ $(document).on("submit", ".login-otp-form", function (e) {
             $('#login-modal').modal("hide");
             // $('.login-form').trigger("reset");
             $('#wait-modal').modal("show");
-            get_wait_modal();}
+             get_wait_modal();
+        }
         else
         response_msg.html('Something went wrong. Please try again later.').show();  //  Error code: '+e.status
         setBtnLoading(btn, false);

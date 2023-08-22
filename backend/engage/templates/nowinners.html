@@ -88,7 +88,6 @@
            max-width: 320px;
            width: 100%;
         }         
-         #go-premium-modal ul li{font-size:1rem;}      
        }
        @media (device-width:768px) {
          nav .bottom-nav {
@@ -124,7 +123,7 @@
     <section class="sec-1 homsec" onclick="window.location.href='{{ operator.operatorwebsite.first_section_url }}'"
              style="background-image: url('{{ operator.operatorwebsite.first_section_image.url }}'); height:auto!important; padding:0px; cursor: pointer;margin-top:10px;">
              <img src="{{ operator.operatorwebsite.first_section_image.url }}" id="deskImg" title="Engage"/>
-             <img src="{{ operator.operatorwebsite.second_section_image.url  }}" id="mobileImg" title="Engage"/>
+             <img src="{{ operator.operatorwebsite.second_section_image.url  }}" id="mobileImg" title="Engage" />
         <div class="text-container max-page-width" style="display: none;">
             <div class="title-home">
             {{ operator.operatorwebsite.first_section_description|safe }}
@@ -142,10 +141,10 @@
     <div class="max-page-width" style="margin-bottom: 40px;">
             <div class="row">
                 <div class="col-md-6" style="margin-bottom: 40px;"> 
-                    <div onclick="$('html, body').animate({ scrollTop: $('#tournaments').offset().top }, 2000);$('.tour-btn').click()" style="display: block;cursor:pointer;margin-top:7px;"><img src="/static/img/join-tournaments-english.png" data-src="/static/img/join-tournaments-english.png" style="width:100%" border="0" class="lazy" /></div> 
+                    <div onclick="$('html, body').animate({ scrollTop: $('#tournaments').offset().top }, 2000);$('.tour-btn').click()" style="display: block;cursor:pointer;margin-top:7px;"><img src="/static/img/join-tournaments-english.png" style="width:100%" border="0" /></div> 
                  </div>
                  <div class="col-md-6" style="margin-bottom: 40px;">
-                     <div onclick="$('html, body').animate({ scrollTop: $('#tournaments').offset().top }, 2000);$('.games-btn').click()" style="display: block;cursor:pointer;"><img src="/static/img/play-hundred-english.png" data-src="/static/img/play-hundred-english.png" style="width:100%" border="0" class="lazy" /></div> 
+                     <div onclick="$('html, body').animate({ scrollTop: $('#tournaments').offset().top }, 2000);$('.games-btn').click()" style="display: block;cursor:pointer;"><img src="/static/img/play-hundred-english.png" style="width:100%" border="0" /></div> 
                  </div>
             </div>
         </div>
@@ -157,9 +156,9 @@
                         {% if section.image_link %}
 
                         {% if 'socialLnk' in section.image_link %}
-                        <a class="a_item" data-toggle="modal" data-target="#share-modal" href="#share-engage"><img src="{{ section.image.url }}" data-src="{{ section.image.url }}" alt="" class="lazy"></a>
+                        <a class="a_item" data-toggle="modal" data-target="#share-modal" href="#share-engage"><img src="{{ section.image.url }}" alt=""></a>
                         {% else %}
-                        <a class="a_item" href="{{ section.image_link }}"><img src="{{ section.image.url }}" data-src="{{ section.image.url }}" alt="" class="lazy"></a>
+                        <a class="a_item" href="{{ section.image_link }}"><img src="{{ section.image.url }}" alt=""></a>
                         {% endif %}
 
                         {% endif %}
@@ -256,7 +255,7 @@
                 {% for game in featured_games %}
                     <div class="featured-item">
                         <a class="featured-game" href="" data-toggle="modal" data-target="#login-modal">
-                            <img src="{{ game.logo.url }}" data-src="{{ game.logo.url }}" alt="">
+                            <img src="{{ game.logo.url }}" alt="">
                         </a>
                     </div>
                 {% endfor %}
@@ -282,7 +281,7 @@
                     {% for game in featured_games %}
                         <div class="featured-item swiper-slide">
                             <a class="featured-game" href="" data-toggle="modal" data-target="#login-modal">
-                                <img src="{{ game.logo.url }}" data-src="{{ game.logo.url }}" alt="">
+                                <img src="{{ game.logo.url }}" alt="">
                             </a>
                         </div>
                     {% endfor %}
@@ -298,8 +297,8 @@
             <div id="tournaments" class="row max-page-width">
                     <div class="title-wrapper c2 with-tabs tabs-container">
                         <a class="tab-link tour-btn" onclick="$('.tournaments-list, .tournaments-list1').show()"
-                           data-id="#latest" href="#home-tournaments">{% translate 'Tournaments' %}</a>
-                        <a class="tab-link games-btn"  href="#home-games" onclick="$('.tournaments-list, .tournaments-list1').hide()"  data-id="#html5">{% translate 'Play Games' %}</a>
+                           data-id="#latest" href="/#home-tournaments">{% translate 'Tournaments' %}</a>
+                        <a class="tab-link games-btn"  href="/#home-games" onclick="$('.tournaments-list, .tournaments-list1').hide()"  data-id="#html5">{% translate 'Play Games' %}</a>
                     </div>
                     <ul class="nav nav-tabs firstTab">
                         <li class="">
@@ -312,10 +311,9 @@
                                class="button-small active upcoming">{% translate 'Upcoming' %}</a>
                         </li>
                         <li class="">
-                            <a onclick="hiya();return getTournaments('ongoing', this)" class="button-small ongoing">Ongoing</a>
-
+                            <a onclick="hiya();return getTournaments('ongoing', this)" class="button-small ongoing">{% translate 'Ongoing' %}</a>
                         </li>
-                        <li style="margin-right: 35px;" class="prev_Btn">
+                        <li style="margin-right: 48px;" class="">
                             <a onclick="hiya();return getTournaments('past', this)"
                                class="button-small previous">{% translate 'Previous' %}</a>
                         </li>
@@ -519,55 +517,9 @@
            </script>
            </div>
            {% endif %}
-            <!-- <section class='sec-3-1'>
-                <div class='row'>
-                    <div class='col col-4 home-winners'> 
-                    <h2 class="winners-title">{% translate 'WINNERS' %}</h2>
-                    <div class="drp_select">
-                        <select class='drp_game'><option value="">{% translate 'Games Tournaments' %} </option>
-                        {% for game in games %}
-                             <option value="{{ game.slug }}">{{game.name}} </option>
-                        {% endfor %}
-                        </select>
-                        <i class="fas fa-angle-down"></i>
-                    </div>
-                      <select class='hiddenTournament_select' style='display:none;'>
-                        {% for tournament in previous_tournaments %}
-                          <option value="{{tournament.id}}" date="{{ tournament.modified|date:"d M Y" }} {{tournament.modified|time:"h:i A"}}" label="{{tournament.label_next_time}}"  game="{{tournament.game.slug}}"  gname="{{tournament.name}}" > {{tournament.name}} </font></option>
-
-
-                        {% endfor %}
-                    </select>
-                    <div class="drp_select"><select class='drp_tournament' placeholder="Search for a tournament here" >
-                        {% for tournament in previous_tournaments %}
-                              <option value="{{tournament.id}}" date="{{ tournament.modified|date:"d M Y" }} {{tournament.modified|time:"h:i A"}}" label="{{tournament.label_next_time}}" game="{{tournament.game.slug}}"  gname="{{tournament.name}}" > {{tournament.name}} </font></option>
-
-
-                        {% endfor %}</select>
-                        <i class='fas fa-angle-down'></i>
-                    </div>
-                    <div class='date winners-date'><div class='winners-date-updated'>{% translate 'Last Updated:' %} </div> <span></span></div>
-                    </div>
-                    <div class='col col-8 home-winners-results'>
-                        <h2 class='home-winners-results-title'></h2>
-                        <div class='container'>
-                            <div class='scroll_wrapper'>
-                                <div class='package'>
-                                    
-                                </div>
-                                <div class='package'>
-                                  
-                                </div>   
-                                    
-                            </div>
-	
-                        </div>
-                    </div>
-                </div>
-            </section>
         </div>
         
-    </section> -->
+    </section>
   
     <section class="sec-4">
         <div>
@@ -575,9 +527,9 @@
                 {% if ad.ad_type == 'image' %}
                     <!-- <img src="{{ ad.ad_file.url }}" alt="{{ ad.ad_file.name }}" style="cursor:pointer;" onclick="window.location.href='{{ ad.ad_link }}'"> -->
                     {% if 'socialLnk' in ad.ad_link %}
-                    <img src="{{ ad.ad_file.url }}" data-src="{{ ad.ad_file.url }}" alt="{{ ad.ad_file.name }}" style="cursor:pointer;" onclick="$('#share-modal').modal('show')" class="lazy">
+                    <img src="{{ ad.ad_file.url }}" alt="{{ ad.ad_file.name }}" style="cursor:pointer;" onclick="$('#share-modal').modal('show')">
                     {% else %}
-                    <img src="{{ ad.ad_file.url }}" data-src="{{ ad.ad_file.url }}" alt="{{ ad.ad_file.name }}" style="cursor:pointer;" onclick="window.location.href='{{ ad.ad_link }}'" class="lazy">
+                    <img src="{{ ad.ad_file.url }}" alt="{{ ad.ad_file.name }}" style="cursor:pointer;" onclick="window.location.href='{{ ad.ad_link }}'">
                     {% endif %}
 
                 {% elif ad.ad_type == 'video' %}

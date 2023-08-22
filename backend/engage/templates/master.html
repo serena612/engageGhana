@@ -59,8 +59,8 @@
         <script src="https://unpkg.com/imagesloaded@4/imagesloaded.pkgd.min.js"></script>
         <script src="https://unpkg.com/isotope-layout@3/dist/isotope.pkgd.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        <script type="application/javascript"
-                src="{% static 'libs/videojs/video.min.js' %}"></script>
+        <!-- <script type="application/javascript"
+                src="{% static 'libs/videojs/video.min.js' %}"></script> -->
         <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-app-compat.js"></script>
         <script src="https://www.gstatic.com/firebasejs/9.1.1/firebase-messaging-compat.js"></script>
         <script src="{% static 'libs/jquery.cookie.min.js' %}"></script>
@@ -186,7 +186,127 @@
                 var currentyear = new Date().getFullYear();
                 $('.currentyear').text(currentyear);
             })
+            
+$(window).on('load', function() {
+    hashchanged();  
+});
+
+
+function hashchanged() {
+    
+    setTimeout(function(){
+    var hash = window.location.hash;
+    if($('.homsec').length!=0){
+        switch (hash) {
+            case "#home-tournaments":
+            
+                var c=$("#sec-3").offset().top;
+            
+        
+                $([document.documentElement, document.body]).animate({
+                        scrollTop: $("#sec-3").offset().top-50,
+                    },
+                    c/1.35
+                );
+                $("#sec-3 a.tour-btn").click();
+                resetStar($('#hometournaments'));
+                break;
+
+            case "#home-games":
+                var i=$("#sec-3").offset().top;
+                $([document.documentElement, document.body]).animate({
+                        scrollTop: $("#sec-3").offset().top-50,
+                    },
+                    i/1.35
+                );
+                $("#sec-3 a.games-btn").click();
+                resetStar($('#homegames'));
+                break;
+
+            case "#winners":
+                var w=$(".sec-3-1").offset().top;
+                    $([document.documentElement, document.body]).animate({
+                            scrollTop: $(".sec-3-1").offset().top-50,
+                        },
+                        w/1.35
+                    );
+                    
+                
+                    resetStar($('#li_winners'));
+                    
+                    break;
+        
+            case "#redeem-coins":
+                var t=$("#prizes_page").offset().top;
+                $("#prizes_page #coins").click();
+                // $([document.documentElement, document.body]).animate({
+                //         scrollTop: $("#prizes_page").offset().top-50,
+                //     },
+                //     t/1.35
+                // );
+            // resetStar($('#a-redeem'));
+                break;
+            
+            case"#tournament-prizes":
+                    //var t=$("#prizes_page").offset().top;
+                // $("#prizes_page #tournaments").click();
+                    // $([document.documentElement, document.body]).animate({
+                    //         scrollTop: $("#prizes_page").offset().top-50,
+                    //     },
+                    //     t/1.35
+                    // );
+                //  resetStar($('#a-prize'));
+                    break;
+            default:
+                if (hash.length > 1) {
+                    $("a[href='" + hash + "']").click();
+                }
+                break;
+        }
+    }
+    else{
+        switch (hash) {
+            case "#home-tournaments":
+                window.location.href='/home'+hash;
+                break;
+
+            case "#home-games":
+                window.location.href='/home'+hash;
+                break;
+
+            case "#winners":
+                var w=$(".sec-3-1").offset().top;
+                    $([document.documentElement, document.body]).animate({
+                            scrollTop: $(".sec-3-1").offset().top-50,
+                        },
+                        w/1.35
+                    );
+                    
+                
+                    resetStar($('#li_winners'));
+                    
+                    break;
+        
+            case "#redeem-coins":
+                var t=$("#prizes_page").offset().top;
+                $("#prizes_page #coins").click();
+                
+                break;
+            
+            case"#tournament-prizes":
+                    break;
+            default:
+                if (hash.length > 1) {
+                    $("a[href='" + hash + "']").click();
+                }
+                break;
+        }
+    }
+   },500);
+    $(window).trigger("resize");
            
+            
+}
             
         </script>
        
@@ -210,8 +330,8 @@
                     appId: "1:615474016768:web:7cfa190a078416cc3a9ee5",
                     measurementId: "G-4FTX1VRLYN"
                   };
-                //var user_subscription = '{{ user.subscription }}';
-                var user_subscription = '{{ user.subscription.strip}}';
+                var user_subscription = '{{ user.subscription }}';
+
 
 
                 var profileData = {
@@ -265,7 +385,8 @@
                 var check_usercoin = "{% url 'user-check-usercoin' 'user_uid' %}"; 
                 var featured_game_retrieve =  '/api/featured_games/';
                 var update_go_premium_flag = "{% url 'user-update-go-premium-flag' 'user_uid' %}"
-                
+                var update_joined_tournaments = "{% url 'user-update-joined-tournaments' 'user_uid' %}";
+
             </script>
             <script type="application/javascript"
                 src="{% static 'js/fcm.js' %}"></script>
@@ -286,8 +407,10 @@
     <style type="text/css">
         @media screen and (orientation:portrait)
         {
-            .rotate_dev, #game-fullscreen-modal #rtdev.rotate_dev{
-                display: block;               
+            .rotate_dev, #game-fullscreen-modal #rtdev.rotate_dev,
+            .fruit_slasher .rotate_dev, #game-fullscreen-modal .fruit_slasher #rtdev.rotate_dev,
+            .fishing_frenzy .rotate_dev, #game-fullscreen-modal .fishing_frenzy #rtdev.rotate_dev{
+                display: block!important;                
             }
              .speed_racer .rotate_dev, #game-fullscreen-modal .speed_racer #rtdev.rotate_dev,
             .sliding_bricks .rotate_dev, #game-fullscreen-modal .sliding_bricks #rtdev.rotate_dev,
@@ -297,6 +420,24 @@
             .kickups .rotate_dev, #game-fullscreen-modal .kickups #rtdev.rotate_dev,
             .galactic_war .rotate_dev, #game-fullscreen-modal .galactic_war #rtdev.rotate_dev,
             .fruit_matching .rotate_dev, #game-fullscreen-modal .fruit_matching #rtdev.rotate_dev{
+            .driver_highway .rotate_dev, #game-fullscreen-modal .driver_highway #rtdev.rotate_dev,
+            .ultimate_boxing .rotate_dev, #game-fullscreen-modal .ultimate_boxing #rtdev.rotate_dev,
+             .the_running_champion .rotate_dev, #game-fullscreen-modal .the_running_champion #rtdev.rotate_dev,
+             .tetris_cube .rotate_dev, #game-fullscreen-modal .tetris_cube #rtdev.rotate_dev,
+             .shot_pong .rotate_dev, #game-fullscreen-modal .shot_pong #rtdev.rotate_dev,
+             .retro_speed .rotate_dev, #game-fullscreen-modal .retro_speed #rtdev.rotate_dev,
+             .racing_game_challenge .rotate_dev, #game-fullscreen-modal .racing_game_challenge #rtdev.rotate_dev,
+             .pocket_jump .rotate_dev, #game-fullscreen-modal .pocket_jump #rtdev.rotate_dev,
+             .jump_red_square .rotate_dev, #game-fullscreen-modal .jump_red_square #rtdev.rotate_dev,
+             .jump_box_hero .rotate_dev, #game-fullscreen-modal .jump_box_hero #rtdev.rotate_dev,
+             .go_to_dot .rotate_dev, #game-fullscreen-modal .go_to_dot #rtdev.rotate_dev,
+             .flaying_triangle .rotate_dev, #game-fullscreen-modal .flaying_triangle #rtdev.rotate_dev,
+             .falling_dots .rotate_dev, #game-fullscreen-modal .falling_dots #rtdev.rotate_dev,
+             .spect .rotate_dev, #game-fullscreen-modal .spect #rtdev.rotate_dev,
+             .jumper_frog .rotate_dev, #game-fullscreen-modal .jumper_frog #rtdev.rotate_dev,
+             .drive_your_car .rotate_dev, #game-fullscreen-modal .drive_your_car #rtdev.rotate_dev,
+             .brick_out .rotate_dev, #game-fullscreen-modal .brick_out #rtdev.rotate_dev,
+             .american_football_kicks .rotate_dev, #game-fullscreen-modal .american_football_kicks #rtdev.rotate_dev{
                 display: none!important; 
             }
         }
@@ -389,7 +530,35 @@
             }
             .info_box iframe .orientation-msg-container{ display:none!important; }
         }
-	
+
+    .lazy {
+      opacity: 0;
+      transition: opacity 0.3s ease-in-out;
+    }
+    
+    .lazy.loaded {
+      opacity: 1;
+    }
+
+    #go-premium-modal ul{
+    color: #fff;
+    font-family: Tahoma;
+    font-size: 1.4rem;
+    width: 100%;
+    text-align: left;
+    list-style-type: none;
+    padding: 0px 27px 0;
+    max-width: 428px;
+    margin: 0 auto;}
+
+#go-premium-modal ul li{
+    padding: 13px 0px;
+    border-bottom: 1px solid #EF0C755E;}
+.caption_footer{
+	color: #7c2b938f;
+	font-family: tahoma;
+	font-size: 1.2rem;
+}   
     
     </style>
 </head>
@@ -466,13 +635,14 @@
                                              class="fas fa-bell"></i></span>
                                 {% if notifications > 0 %}         
                                     <span class="badge badge-pill" style='background:#EA2D2D'
-                                          id="notifications-count">{{ notifications }}</span> <!--{{ notifications }}-->
-                                {% elif notifications == 0 %} 
-                                    <span class="badge badge-pill" style='background:#9373bb'
+
+
+
                                           id="notifications-count">{{ notifications }}</span> 
+                                
                                 {% else %}  
                                     <span class="badge badge-pill" 
-                                          id="notifications-count">{{ notifications }}</span> <!--{{ notifications }}-->
+                                          id="notifications-count">{{ notifications }}</span>
                                 {% endif %}             
                                 </span>
 
@@ -480,7 +650,7 @@
                                     <div class="heading">
                                         <h4>{% translate 'Notifications' %}</h4>
                                         <div class="rall">Read All</div>
-                                        <div class="rall" >Read All</div>
+
                                     </div>
 
                                     <ul id="notification-list"
@@ -627,10 +797,10 @@
         <ul class="s-menu">
             <li>
                 <a id="hometournaments"
-                   href="/#home-tournaments">{% translate 'TOURNAMENTS' %}</a>
+                   href="#home-tournaments">{% translate 'TOURNAMENTS' %}</a>
             </li>
             <li>
-                <a id="homegames" href="/#home-games">{% translate 'GAMES' %}</a>
+                <a id="homegames" href="#home-games">{% translate 'GAMES' %}</a>
             </li>
             <li>
                 <a id="a-prize" href="{% url 'prizes' %}" >{% translate 'PRIZES' %}</a>
@@ -639,7 +809,12 @@
                 <a href="/prizes#redeem-coins" id="a-redeem">{% translate 'REDEEM' %}</a>
             </li>
             <li>
-                <a href='/#winners' id="li_winners">{% translate 'WINNERS' %}</a>
+                <a href='/winners' id="li_winners">{% translate 'WINNERS' %}</a>
+
+            </li>
+            <li>
+                <a href='https://www.youtube.com/watch?v=W9Ul9pzkRo0&list=PLC7WQmE-6rFDGgR3KwWwKU6ehx6f6e5mL' id="li_guide" target="_blank">{% translate 'GUIDE' %}</a>
+
             </li>
             {% if user.is_authenticated and user.subscription == "free"%}
             <li>
@@ -663,7 +838,7 @@
         </a>
         {% endif %}
         
-         <hr style="opacity: 1!important; margin: 56px 20px 10px!important; background-color: #2C2F36!important"/>
+        <hr style="opacity: 1!important; margin: 56px 20px 10px!important; background-color: #2C2F36!important"/>
         <div class="smedias" style="margin: 0px 20px;padding-top: 20px;">
             <a href="https://www.facebook.com/people/Engageplaywin/100087993253458/" target="_blank" style="display:block;float:left;margin: 0px 7px 0px 18px;padding: 0px;cursor: pointer;"><img src="{% static 'img/facebook.png' %}" border="0" style="width: 32px;" /></a>
             <a href="https://www.instagram.com/mtnengageplaywin/" target="_blank" style="display:block;float:left;margin: 0px 7px 0px 33px;padding: 0px;cursor: pointer;"><img src="{% static 'img/instagram.png' %}" border="0" style="width: 32px;" /></a>
@@ -2205,7 +2380,7 @@
 
 
 {% if user.is_authenticated and user.subscription == "free" and user.go_premium_sent == False%}
-<div id="go-premium-modal" class="modal fade">
+<!-- <div id="go-premium-modal" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content" style="text-align: center; background-color: #0D132D; ">          
             <div class="modal-body" style="padding: 20px 0 52px 0;margin: 0px auto 6px;">                    
@@ -2217,6 +2392,38 @@
                 </div>                    
                <div class="btn_upgrade" style="cursor: pointer; background-color: #FF0090; font-weight: bold; color: #181022; text-align: center; max-width: 292px; margin: 33px auto 0; height: 57px; line-height: 57px; text-transform: uppercase; font-size: 25px;">{% translate 'I Agree' %}</div>                   
             </div>
+        </div>
+    </div>
+</div> -->
+
+<div id="go-premium-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content" style="text-align: center; background-color: #0D132D;">          
+
+            <div class="modal-body" style="padding: 0px 0 52px 0;margin: 0px auto 6px;">                    
+                <div class="close-box" style="background: transparent; float: right; margin-bottom: 36px; margin-right: 17px;">
+                   <a data-dismiss="modal" href=""><i class="fas fa-times" style="color: black; background-color: #EF0C75; cursor: pointer; width: 27px; height: 28px; text-align: center; padding-top: 3px; border-radius: 20px; top: 31px; position: absolute; right: 19px;"></i></a>
+                    
+                </div>
+                <div>
+				    <img src='/static/img/premium_puic.jpg'/>
+                   <ul>
+					  <li>1. PLAY ALL TROURNAMENTS</li>
+					  <li>2. WIN CASH & DATA</li>
+					  <li>3. UNLOCK ALL GAMES</li>
+                      <li>4. EARN MORE COINS</li>
+					  <li>5. ACCESS ALL AVATARS</li>
+					  <li>6. UNLIMITED FRIENDS</li>
+                      <li style="border:0">7. ACCESS ALL OTHER FEATURES</li>
+					</ul>
+                </div>    
+               <div class="caption_footer">Daily Subscription N50 <br/> Cancel Anytime</div>                
+               <div class="btn_upgrade" style="cursor: pointer; background-color: #FF0090; font-weight: bold; color: #181022; text-align: center; max-width: 292px; margin: 13px auto 0; height: 57px; line-height: 57px; text-transform: uppercase; font-size: 25px;">I Agree</div>                   
+
+
+
+            </div>
+
         </div>
     </div>
 </div>
@@ -2372,7 +2579,61 @@ screen.orientation.addEventListener("change", function(e) {
             });
  
 </script>
+function lazyLoadImage() {
+    var lazyImages = [].slice.call(document.querySelectorAll("img.lazy"));
+    
+    if ("IntersectionObserver" in window) {
+      let lazyImageObserver = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            let lazyImage = entry.target;
+            lazyImage.src = lazyImage.dataset.src;
+            lazyImage.classList.add("loaded");
+            lazyImageObserver.unobserve(lazyImage);
+          }
+        });
+      });
+      
+      lazyImages.forEach(function(lazyImage) {
+        lazyImageObserver.observe(lazyImage);
+      });
+    }
+}
+$(window).on("scroll", function() {
+    lazyLoadImage();
+  });
 
+
+<!-- <script>
+   function isElementInViewport(element) {
+      var rect = element.getBoundingClientRect();
+      return (
+        rect.top >= 0 &&
+        rect.left >= 0 &&
+        rect.bottom <= (window.innerHeight || document.documentElement.clientHeight) &&
+        rect.right <= (window.innerWidth || document.documentElement.clientWidth)
+      );
+    }
+
+    function lazyLoadImage() {
+      $(".lazy").each(function() {
+        if (isElementInViewport(this)) {
+          if ($(this).attr("data-src")) {
+            $(this).attr("src", $(this).attr("data-src"));
+            $(this).removeAttr("data-src");
+           
+          }
+        }
+      });
+    }
+
+   
+
+    $(window).on("scroll", function() {
+      lazyLoadImage();
+    });
+    </script> -->
+      
 </body>
 </html>
 

@@ -172,6 +172,7 @@ $(function () {
                             $('#joinStatus').html('<a style="cursor: default" class="disabled">Waiting List</a>');
                             showInfoModal('Waiting List', '<p>You were added in the waiting list since the tournament is already full. You will be added automatically in case active users left the tournament.</p>')
                         } else {
+                            update_joinedtrn();
                             $('#joinStatus').html('<a style="cursor: default">Joined <img src="/static/img/check.svg" class="joined-in" alt=""></a>');
                             showInfoModal("You're in!", "<p>You have joined the tournament successfully.</p>")
                         }
@@ -303,6 +304,7 @@ $("#pay-btn").click(function (e) {
                                     } else {
                                         $('#joinStatus').html('<a style="cursor: default">Joined <img src="/static/img/check.svg" class="joined-in" alt=""></a>');
                                         showInfoModal("You're in!", "<p>You have joined the tournament successfully.</p>")
+                                        update_joinedtrn();
                                     }
                                     setBtnLoading(btn, false);
                                 },
@@ -351,6 +353,25 @@ $("#pay-btn").click(function (e) {
     })
 })
 
+function update_joinedtrn() {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: update_joined_tournaments.replace("user_uid", user_uid),
+            headers: {
+                "X-CSRFToken": xtoken,
+            },
+            type: "post",
+            data: {},
+            error: function (value) {
+                reject(value);
+            },
+            success: function (value) {
+                value.is_sub
+                    resolve(value);
+            },
+        });
+    });
+}
 
 $('.register_btn').on("click", function () {
     function check_user_new_status() {

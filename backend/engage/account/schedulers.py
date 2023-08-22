@@ -187,3 +187,14 @@ def check_users_level(self):
         if user.is_billed == True:
             user.level+=1
             user.save()      
+
+@shared_task(bind=True)
+def update_joined_tournaments(self):
+    prefix = "update_joined_tournaments"
+    if block_multiple_celery_task_execution(self, prefix):
+        return
+    users = User.objects.all()
+    for user in users:
+        if user.tournament_joined_today == True:
+            user.tournament_joined_today = False
+            user.save()

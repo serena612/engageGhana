@@ -19,7 +19,8 @@ class SupportedGame(LabelChoices):
     PUBG = 'pubg', 'PUGB'
     COD = 'cod', 'Call Of Duty'
     FIFA = 'fifa', 'Fifa'
-
+    FREE_FIRE = 'free_fire', 'Free Fire'
+    FARLIGHT84 = 'Farlight84', 'farlight84'
 
 class EventType(LabelChoices):
     SHOW = 'show', 'SHOWS'

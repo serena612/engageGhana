@@ -6,13 +6,20 @@ if(mobileOS=='pc')
    
 $(function () {
 
+
+
+
+
+
+
+    
     $('.sec-3-1 .drp_tournament').selectize({
       sortField: 'text'
     });
     $('.sec-3-1 .drp_game').selectize({
       sortField: 'text'
     });
-    
+      
   // load winners on page load
   getWinners($('.drp_game').val(),$('.drp_tournament  .selectize-input').find('.item').attr('data-value'));
   $('.drp_game').on('change', function() {
@@ -23,7 +30,13 @@ $(function () {
       $('.drp_tournament  .selectize-input').click();
       $('.drp_tournament  .selectize-dropdown').addClass('invisible');
       }, 500);
-      
+
+
+
+
+
+
+              
     }
      setTimeout(function(){
       $('.drp_tournament  .selectize-dropdown-content').find('.option').hide();
@@ -34,7 +47,7 @@ $(function () {
         if($('.drp_tournament  .selectize-dropdown-content').find('.option').length > 0){
           $('.drp_tournament  .selectize-dropdown-content').find('.option').each(function(ind1){
             if(value =='' || (value == firstItem.attr('game') &&  $('.drp_tournament  .selectize-dropdown-content').find('.option').eq(ind1).attr('data-value')==firstItem.attr('value'))){
-              
+      
               $('.drp_tournament  .selectize-dropdown-content').find('.option').eq(ind1).show();
               if(!selected)
               {
@@ -45,23 +58,34 @@ $(function () {
             }
           })
         }
-      
         
-      })
+
    
+      })
+
+
+
+
+    
       getWinners($('.drp_game').val(), $('.drp_tournament  .selectize-input').find('.item').attr('data-value'));
       $('.sec-3-1 select.drp_tournament option').eq(0).attr("value",$('.drp_tournament  .selectize-input').find('.item').attr('data-value'));
       $('.sec-3-1 select.drp_tournament option').eq(0).text($('.drp_tournament .selectize-input').find('.item').text());
       $('.drp_tournament  .selectize-dropdown-content').find('.option').removeClass('selected').removeClass('active');
       $('.drp_tournament  .selectize-dropdown-content').find('.option[data-value='+$('.drp_tournament  .selectize-input').find('.item').attr('data-value')+']').addClass('selected').addClass('active');
-    
+      
       var valueTournament = $('.drp_tournament  .selectize-input').find('.item').attr('data-value');
       if(valueTournament == undefined)
             $(".loading-tr").find(".loading-img").hide();
      },500);
-      
     
    
+
+
+
+
+
+
+
   });
   $('.sec-3-1 .drp_tournament').on('change', function() {
       setTimeout(function(){
@@ -70,11 +94,22 @@ $(function () {
         getWinners($('.drp_game').val(),$('.drp_tournament  .selectize-input').find('.item').attr('data-value'));
 
 
+
+
+
+    
        var valueTournament = $('.drp_tournament  .selectize-input').find('.item').attr('data-value');
        if(valueTournament == undefined)
           $(".loading-tr").find(".loading-img").hide();
       },600)
-    
+
+
+
+
+
+
+
+               
     })
      $('.drp_tournament  .selectize-control').click(function(){
          var active = $('.drp_tournament.selectized').val();
@@ -86,16 +121,21 @@ $(function () {
                   $('.drp_tournament  .selectize-input').find('.item').attr('data-value',$('.drp_tournament  .selectize-dropdown-content').find('.option.active').attr('data-value'));
                   getWinners($('.drp_game').val(),$('.drp_tournament .selectize-input').find('.item').attr('data-value'));
                  }
-               
+
           },700)
      });
-
+  
   // load tournaments on page load
   $(".tour-btn").click();
+
   
   // add scroll for winners list
     $('.scroll_wrapper').css('width',($('.package').outerWidth(true) + 20)*$('.package').length + 'px');
   //
+
+
+
+
   
   //   make featured games in multiple rows (5 items in the columns)
   var f_games_parent = $(".featured-games-parent");
@@ -104,9 +144,16 @@ $(function () {
   var new_item = $("<div></div>");
   new_item.attr("class", main_f_games.attr("class"));
   var mobileOS = mobilecheck();
-  
+
     for (let i = 0; i < f_games_items.length; i++) {
     const item = $(f_games_items[i]);
+
+
+
+
+
+
+
 
     if (new_item.find(".featured-item").length < 5) {
       new_item.append(item);
@@ -117,7 +164,7 @@ $(function () {
       f_games_parent.append(new_item);
       new_item.append(item);
     }
-
+ 
     const item_link = item.find("a");
     if (mobileOS === "android") {
       item_link.attr("href", item_link.data("link-android"));
@@ -127,7 +174,27 @@ $(function () {
       item_link.attr("href", item_link.data("link-pc"));
     }
     }
- 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // var swiper = new Swiper(".mySwiper", {
     //   breakpoints: {
@@ -148,7 +215,7 @@ $(function () {
     //     el: ".swiper-scrollbar",
     //     draggable: true,
     //   },
-    // });
+// });
 
   //scroll to tournaments section or games section when user clicks the navbar links
   $("#hometournaments, #homegames,#li_winners").on("click", function () { //,#a-redeem,#a-prize
@@ -215,7 +282,7 @@ $("#upgrade-package-pgame-modal .modal-content").on("click", function () {
               type: "post",
               data: {},
               error: function (value) {
-                resolve(value);
+                  reject(value);
               },
               success: function (value) {
                   value.is_sub

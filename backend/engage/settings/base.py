@@ -24,6 +24,10 @@ from django.conf import settings
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+import datetime
+
+# Get the current date
+current_date = datetime.date.today()
 
 # load the env file
 # u should put the .env file in the main root dir (outside backend folder)
@@ -58,6 +62,32 @@ LOCALE_PATHS = (
     os.path.join(BASE_DIR, 'operator', 'locale'),
     os.path.join(BASE_DIR, 'templates', 'locale'),
 )
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'TimedRotatingFileHandler': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': 'headers-' + current_date.strftime("%Y-%m-%d") + '.log',
+            'formatter': 'verbose',
+        },
+    },
+    'loggers': {
+        'custom_logger': {
+            'handlers': ['TimedRotatingFileHandler'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s - %(levelname)s - %(message)s'
+        },
+    },
+}
 
 
 # Application definition
@@ -403,7 +433,11 @@ app.conf.beat_schedule = {
     'every_14_days_notifications': {
         'task': 'engage.account.schedulers.every_14_days_notifications',
         'schedule': crontab(minute=0, hour=4)
-    }
+    },
+    'update_joined_tournaments': {
+        'task': 'engage.account.schedulers.update_joined_tournaments',
+        'schedule': crontab(minute=0, hour=0)
+    },
 }
 
 

@@ -16,6 +16,7 @@ from .models import (
 )
 from ..core.fields import SVGAndImageFormField
 # -*- coding: utf-8 -*-
+from django.contrib import messages
 
 class OperatorHomeSectionModelForm(TranslatableModelForm): #ModelForm
     class Meta:
@@ -101,8 +102,18 @@ class OperatorAdmin(TranslatableAdmin):  #admin.ModelAdmin
         extra_context = extra_context or {}
         extra_context['show_save_and_add_another'] = False
         extra_context['show_delete'] = False
-        return super().change_view(request, object_id, form_url,
-                                   extra_context=extra_context)
+        try:
+            return super().change_view(request, object_id, form_url, extra_context=extra_context)
+        except Exception as e:
+            # Log the error or display it using Django's messages framework
+            messages.error(request, f"Error while saving: {str(e)}")
+            # You can also log the error to a log file or console for debugging purposes.
+            # logger.error(f"Error while saving Operator (ID: {object_id}): {str(e)}")
+            return self.response_error(request, e)
+        
+        # return super().change_view(request, object_id, form_url,
+        #                            extra_context=extra_context)
+        
 
 
 @admin.register(Region)

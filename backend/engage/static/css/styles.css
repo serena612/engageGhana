@@ -5440,8 +5440,14 @@ font-size: 1.75rem;
   max-width: 255px;
   text-align: CENTER;}
 
-  .firstTab .drp_select select{background:#1F1343;margin-left: 51px;
-  width:100%;max-width:259px;border:1px solid #513a96;color:#fff;height:40px;
+  .firstTab .drp_select select {
+    background: #1F1343;
+    margin-left: 35px;
+    width: 100%;
+    max-width: 259px;
+    border: 1px solid #513a96;
+    color: #fff;
+    height: 40px;
   padding-left: 7px;
   }
   #tournaments .firstTab .drp_select select{
@@ -7429,3 +7435,29 @@ pointer-events: none;}
   margin: 0;
 }
 #go-premium-modal{} /*{display:block;}*/
+
+@media (max-width:768px){
+.firstTab li{
+display: block!important;    margin-right: 10px;
+margin-top: 13px;}
+.firstTab li:nth-child(1){display:none!important;}
+.firstTab{
+    align-items: center;
+    justify-content: center;
+    margin: 0 0px 33px;
+}
+.firstTab li:nth-child(2){    margin-left: 2px!important;}
+
+.sec-3 .firstTab .drp_select select{margin-left:0!important;}
+.sec-3 .firstTab .drp_select i{top:23px!important;right:9px!important;} 
+
+}
+@media (max-width:767px){
+.firstTab li:nth-child(4) {
+    margin-right: 1px!important;
+    margin-left: 4px;
+}
+
+
+
+}

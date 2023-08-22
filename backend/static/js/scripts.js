@@ -324,7 +324,7 @@ $(document).on("click", ".tabs-container a,.firstTab a,.secondTab a", function (
     {
         $('.firstTab').css('display','flex');
         $('.secondTab').hide();
-        $('.firstTab').find('a').eq(0).click();
+        //$('.firstTab').find('a').eq(0).click();
         $('.tournament_game_content').hide();
         $('#tournament_dv').show();
     }

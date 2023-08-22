@@ -1,0 +1,385 @@
+{% extends 'master.html' %}
+{% load i18n %}
+{% load static %}
+{% load humanize %}
+
+
+{% block javascript %}
+    <link rel="stylesheet" href="{% static 'css/swiper-bundle.min.css' %}">
+    <script src="{% static 'js/swiper-bundle.min.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/paginate.css' %}">
+    <script src="{% static 'js/paginate.js' %}"></script>
+    <script src="{% static 'js/selectize.min.js' %}" ></script>
+    <link rel="stylesheet" href="{% static 'css/selectize.bootstrap3.min.css' %}"  />
+    <script src="{% static 'js/pages/home.js' %}"></script>
+
+    <script>
+        var is_ad_google = '{{ is_ad_google }}';
+        var is_ad_engage = '{{ is_ad_engage }}';
+        var lang_code = '{{ lang_code }}';
+        var winner_transl = {% blocktrans %}"winners" {% endblocktrans %};
+        var leisureGames_transl = {% blocktrans %}"Please login or register to Engage to be able to play leisure games, earn coins, and win multiple prizes" {% endblocktrans %};
+        var featuredGames_transl = {% blocktrans %}"Please login or register to Engage to be able to play featured games and win multiple prizes" {% endblocktrans %};
+        var joinNow_transl = {% blocktrans %}"Please login or register to Engage to be able to join tournaments and compete with others to earn many cash and other prizes" {% endblocktrans %};
+        var getBtn_transl = {% blocktrans %}"Please login or register to Engage to buy coins, increase your balance, and win multiple cash and other prizes" {% endblocktrans %};
+        var redeemGifts_transl = {% blocktrans %}"Please login or register to Engage to redeem gifts and win multiple cash and other prizes" {% endblocktrans %};
+        var join_now = {% blocktrans %}"JOIN NOW" {% endblocktrans %};
+        var pool_prize = {% blocktrans %}"POOL PRIZE" {% endblocktrans %};
+        var register = {% blocktrans %}"REGISTER" {% endblocktrans %};
+        var send_coins = {% blocktrans %}"Send Coins" {% endblocktrans %};
+        var unfriend = {% blocktrans %}"Unfriend" {% endblocktrans %};
+        var view = {% blocktrans %}"VIEW" {% endblocktrans %};
+        var upcoming = {% blocktrans %}"Upcoming" {% endblocktrans %};
+        var previous = {% blocktrans %}"Previous" {% endblocktrans %};
+        var ongoing = {% blocktrans %}"Ongoing" {% endblocktrans %};
+        $('nav').removeClass('hih')
+    </script>
+
+    <style>
+        #are_you_engager{
+           max-width: 460px;
+           width: 58%;
+        }
+              
+       
+      
+       .sec-1{ width: 100%; overflow: hidden;background-position: left top!important; margin-top: -46px;height:auto!important; padding: 0;min-height:300px;}
+        .home-btn-main{
+            font-weight: bold;
+            font-style: italic;
+            background: #a4156b;
+        }
+        
+        .title-home{
+            /* text-transform: capitalize;
+            margin-bottom: -10px;
+            color:#eb1ab6; */
+       }
+       #mobileImg, #deskImg
+       {
+           visibility: hidden;
+           width: 100%;
+       }
+       #mobileImg{
+           display: none;
+       }
+       #deskImg
+       {
+           display: block;
+       }
+       .sec-1 .text-container
+       {
+           position: absolute;
+           top: 0;
+           left: 0;
+           margin: 240px 8%;
+       }
+       .firstTab .drp_select select
+       {
+        appearance: none;
+       }
+       @media (max-width:767px){
+           .sec-1{background-image:url('{{ operator.operatorwebsite.second_section_image.url }}')!important;     margin-top: 52px!important;}
+           .sec-4 img{content: url('{{ ad.ad_file_mobile.url }}');}
+           #mobileImg{display: block!important;}
+           #deskImg { display: none!important; } 
+           .sec-1 .text-container{margin: 125px 5%!important;}  
+           #are_you_engager{
+           max-width: 320px;
+           width: 100%;
+        }         
+       }
+       @media (device-width:768px) {
+         nav .bottom-nav {
+                 margin-top: -34px;
+           padding-left: 19px;
+             }
+        }
+       @media (device-width:820px) and (device-height:1180px){
+         nav .bottom-nav {
+                  margin-top: -40px;     margin-left: -4px;
+                       }
+        }
+    @media (max-width: 320px){
+     .firstTab .drp_select select {
+         margin-left:0;
+     }}
+    
+     @media (max-width: 1280px) and (orientation: landscape){
+        .sec-2 .slid-parent .text-content p {
+            font-size: 1.5vw!important;
+        }
+    }
+    #st-1 .st-btn{
+        display: inline-block!important;
+    }
+
+    </style>
+
+    
+{% endblock %}
+
+{% block top_section %}
+    <section class="sec-1 homsec" onclick="window.location.href='{{ operator.operatorwebsite.first_section_url }}'"
+             style="background-image: url('{{ operator.operatorwebsite.first_section_image.url }}'); height:auto!important; padding:0px; cursor: pointer;margin-top:10px;">
+             <img src="{{ operator.operatorwebsite.first_section_image.url }}" id="deskImg" title="Engage"/>
+             <img src="{{ operator.operatorwebsite.second_section_image.url  }}" id="mobileImg" title="Engage" />
+        <div class="text-container max-page-width" style="display: none;">
+            <div class="title-home">
+            {{ operator.operatorwebsite.first_section_description|safe }}
+</div>
+            <!-- <a class="btn1 home-btn-main"
+               href="{{ operator.operatorwebsite.first_section_url }}">
+                {{ operator.operatorwebsite.first_section_button_title }}
+            </a> -->
+        </div>
+    </section>
+{% endblock %}
+
+{% block content %}
+    <section class="sec-2">
+    <div class="max-page-width" style="margin-bottom: 40px;">
+            <div class="row">
+                <div class="col-md-6" style="margin-bottom: 40px;"> 
+                    <div onclick="$('html, body').animate({ scrollTop: $('#tournaments').offset().top }, 2000);$('.tour-btn').click()" style="display: block;cursor:pointer;margin-top:7px;"><img src="/static/img/join-tournaments-english.png" style="width:100%" border="0" /></div> 
+                 </div>
+                 <div class="col-md-6" style="margin-bottom: 40px;">
+                     <div onclick="$('html, body').animate({ scrollTop: $('#tournaments').offset().top }, 2000);$('.games-btn').click()" style="display: block;cursor:pointer;"><img src="/static/img/play-hundred-english.png" style="width:100%" border="0" /></div> 
+                 </div>
+            </div>
+        </div>
+        
+        <div class="slid-parent max-page-width">
+            {% for section in operator.operatorhomesection_set.all %}
+                <div>
+                    <div class="slid-item">
+                        {% if section.image_link %}
+
+                        {% if 'socialLnk' in section.image_link %}
+                        <a class="a_item" data-toggle="modal" data-target="#share-modal" href="#share-engage"><img src="{{ section.image.url }}" alt=""></a>
+                        {% else %}
+                        <a class="a_item" href="{{ section.image_link }}"><img src="{{ section.image.url }}" alt=""></a>
+                        {% endif %}
+
+                        {% endif %}
+                        
+                        {% if section.title or section.summary %}
+                        <div  class="text-content">
+                            {% if 'socialLnk' in section.image_link %}
+
+                            <a class="scl" data-toggle="modal" data-target="#share-modal" href="#share-engage">
+                                <p class="t">{{ section.title }}</p>
+                                <p>{{ section.summary }}</p>
+                                {% if section.button_label%}
+                                   <div class="small_btn">{{ section.button_label }}</div>
+                                {% endif %}
+                            </a>
+
+                            {% else %}
+
+                            <a href="{{ section.image_link }}">
+                            <p class="t">{{ section.title }}</p>
+                            <p>{{ section.summary }}</p>
+                            {% if section.button_label%}
+                               <div class="small_btn">{{ section.button_label }}</div>
+                            {% endif %}
+                            </a>
+                                
+                            {% endif %}
+
+                            
+
+
+                        </div>
+                        {% endif %}
+                        {% comment %} <a class="close-btn"><i class="fas fa-times"></i></a>
+                        <div class="hidden-content"
+                             style="background-image: url('{{ section.background_image.url }}');">
+                            <div class="bottom">
+                                <a href="{{ section.image_link }}">{% blocktranslate %}Prepare To
+                                    <span>Engage</span> And Truly connect{% endblocktranslate %}</a>
+                            </div>
+                        </div> {% endcomment %}
+                       
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    {% if show_ads %}
+    <div class="banner" id="banner1" style="width: 100%;max-width: 1400px; height: 150px; margin: auto;">
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1363749472822465"
+        crossorigin="anonymous"></script>
+   <!-- banner 1 -->
+   <ins class="adsbygoogle"
+        style="display:block"
+        data-ad-client="ca-pub-1363749472822465"
+        data-adtest="on"
+        data-ad-slot="7493249819"
+        data-ad-format="auto"
+        data-full-width-responsive="true"></ins>
+   <script>
+        (adsbygoogle = window.adsbygoogle || []).push({});
+   </script>
+   </div>
+   {% endif %}
+
+   <section class="page-container featured-title"
+             style="text-align: center; margin-top:60px; padding-bottom: 50px">
+        <!-- <h1 class='h1_home'>{% translate 'PLAY, WIN AND EARN COINS' %}</h3>     
+        <h3 class='h3_home'>{% translate 'PLAY ANY OF THE FEATURED GAMES' %}</h3> -->
+        <div class="text-center">
+            <img src="/static/img/Homepage-are-you-an-engager.png" id="are_you_engager" />
+        </div>
+        <div class="text-center">
+            <img src="/static/img/whitePic.png" id="are_you_engager" style="margin-bottom: 16px;" />
+        </div>
+        <div class="featured-games-parent"></div>
+        <div class="featured-games max-page-width" id="main-featured-games">
+            {% if user.is_authenticated %}
+                {% for game in featured_games %}
+                    <div class="featured-item">
+                        <a href=""
+                           data-id="{{ game.id }}"
+                           data-link-android="{{ game.android_link }}"
+                           data-link-ios="{{ game.ios_link }}"
+                           data-link-pc="{{ game.pc_link }}" target="_blank">
+                            <img src="{{ game.logo.url }}" alt="">
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% for game in featured_games %}
+                    <div class="featured-item">
+                        <a class="featured-game" href="" data-toggle="modal" data-target="#login-modal">
+                            <img src="{{ game.logo.url }}" alt="">
+                        </a>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div> 
+
+
+        {% comment %} <div class="featured-games max-page-width swiper mySwiper" id="desktop-featured-games">
+            <div class="swiper-wrapper">
+                {% if user.is_authenticated %}
+                    {% for game in featured_games %}
+                        <div class="featured-item swiper-slide">
+                            <a href=""
+                            data-id="{{ game.id }}"
+                            data-link-android="{{ game.android_link }}"
+                            data-link-ios="{{ game.ios_link }}"
+                            data-link-pc="{{ game.pc_link }}" target="_blank">
+                                <img src="{{ game.logo.url }}" alt="">
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    {% for game in featured_games %}
+                        <div class="featured-item swiper-slide">
+                            <a class="featured-game" href="" data-toggle="modal" data-target="#login-modal">
+                                <img src="{{ game.logo.url }}" alt="">
+                            </a>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+            <div class="swiper-scrollbar"></div>
+        </div> {% endcomment %}
+
+    </section>
+    
+    <section class="sec-3" id="sec-3" style='padding-bottom: 9px;'>
+        <div class="page-container">
+            {% if show_ads %}
+            <div class="banner" id="banner2" style="width: 100%; height: 150px; max-width: 1250px; margin: auto;">
+                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1363749472822465"
+                crossorigin="anonymous"></script>
+           <!-- banner 2 - index -->
+           <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-1363749472822465"
+                data-adtest="on"
+                data-ad-slot="9241445755"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+           <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+           </script>
+           </div>
+           {% endif %}
+           
+        </div>
+        
+    </section>
+  
+    <section class="sec-4">
+        <div>
+            
+                {% if ad.ad_type == 'image' %}
+                    <!-- <img src="{{ ad.ad_file.url }}" alt="{{ ad.ad_file.name }}" style="cursor:pointer;" onclick="window.location.href='{{ ad.ad_link }}'"> -->
+                    {% if 'socialLnk' in ad.ad_link %}
+                    <img src="{{ ad.ad_file.url }}" alt="{{ ad.ad_file.name }}" style="cursor:pointer;" onclick="$('#share-modal').modal('show')">
+                    {% else %}
+                    <img src="{{ ad.ad_file.url }}" alt="{{ ad.ad_file.name }}" style="cursor:pointer;" onclick="window.location.href='{{ ad.ad_link }}'">
+                    {% endif %}
+
+                {% elif ad.ad_type == 'video' %}
+                    <video controls="controls">
+                        <source src="{{ ad.ad_file.url }}" type="video/mp4"/>
+                    </video>
+                {% else %}
+                    <span>{% translate 'Ad Image/Video Here' %}</span>
+                {% endif %}
+           
+        </div>
+    </section>
+
+    <form class="frmregister3 d-none" method="post" name="frmregister3" id="frmregister3"> 
+        {% csrf_token %}
+     
+                <button type="submit" class="btn3">{% translate 'Join Now' %}</button>
+    
+    </form>
+
+    <div id="share-modal" class="modal fade">
+        <div class="modal-dialog modal-md">
+            <div class="modal-content">
+                <div class="close-box">
+                    <a data-dismiss="modal" href=""><i class="fas fa-times"></i></a>
+                </div>
+                <div class="modal-header">
+                    <h3>{% translate 'Share Engage' %}</h3>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12 mb-3">
+                            {% if user.is_authenticated %}
+                            <input type="text" class="input1 share-link-input"
+                                   value="https://www.engageplaywin.com/register?referrer={{ user.uid }}"
+                                   readonly>
+                            {% else %}
+                            <input type="text" class="input1 share-link-input"
+                                   value="https://www.engageplaywin.com/register"
+                                   readonly>
+                            {% endif %}
+                            <div class="text-right">
+                                <button onclick="copyToClipboard($('.share-link-input').val()); $(this).html('COPIED')"
+                                        class="btn3">
+                                    {% translate 'COPY' %}
+                                </button>
+                                {% if user.is_authenticated %}
+                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engageplaywin.com/register?referrer={{ user_uid }}"></div><!-- ShareThis END -->
+                                {% else %}
+                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engageplaywin.com/register"></div><!-- ShareThis END -->
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

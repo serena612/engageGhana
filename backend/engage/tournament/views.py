@@ -4,7 +4,7 @@ from django.utils import timezone
 from datetime import  timedelta
 from engage.account.constants import SubscriptionPlan
 from engage.tournament.models import Tournament, TournamentParticipant, TournamentPrize
-
+from engage.account.models import User
 
 def tournament_view(request, slug):
     user = request.user
@@ -83,6 +83,8 @@ def tournament_view(request, slug):
     if tournament.time_compared_to_gmt and int(tournament.time_compared_to_gmt)<0 :  # '-' in 
         tournament_closed = tournament.close_date - timedelta(hours=int(tournament.time_compared_to_gmt))
     
+    tournament_joined_today = User.objects.filter(username=user.username).values_list('tournament_joined_today', flat=True).first()
+
     return render(request, 'tournament.html', {'tournament': tournament,
                                                'user': user,
                                                'starts_in_full': starts_in_full,
@@ -91,4 +93,5 @@ def tournament_view(request, slug):
                                                'tournament_closed': tournament_closed,
                                                'participant': participant,
                                                'can_join': can_join,
-                                               'currentDate':now})
+                                               'currentDate':now,
+                                               'tournament_joined_today':tournament_joined_today})

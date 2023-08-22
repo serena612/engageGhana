@@ -1,0 +1,40 @@
+{% load i18n %}
+{% load static %}
+{% load big_number %}
+{% load countries %}
+{% load call_method %}
+{% load humanize %}
+{% get_countries as countries %}
+{% load l10n %}
+
+{{ my_date|localize }}
+{{ my_number|localize }}
+
+
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-C0XVDBF16H"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-C0XVDBF16H');
+    </script>
+
+    <link rel="icon" href="{% static 'img/favicon.png' %}">
+    {% block meta %}
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Engage App</title>
+</head>
+
+<body>
+
+    {% block content %}
+    {% endblock %}     
+</body>
+</html>
+

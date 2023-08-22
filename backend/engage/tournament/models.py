@@ -7,6 +7,7 @@ from django.utils.text import slugify
 from model_utils import FieldTracker
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from engage.account.models import PhonyNumberField
 from common.models import TranslatableTimeStampedModel,TimeStampedModel
 from parler.models import TranslatedFields
 from .constants import (
@@ -484,7 +485,7 @@ class TournamentParticipant(TranslatableTimeStampedModel): #TimeStampedModel
     rank = models.IntegerField(default=0)
     points = models.IntegerField(default=0)
     notify_before_game = models.BooleanField(default=True)
-
+    mobile_number = PhonyNumberField(max_length=15, blank=True, null=True, unique=True)
     prize = RichTextField(blank=True, null=True)
     is_waiting_list = models.BooleanField(default=False)
     # is_informed = models.BooleanField(default=False)

@@ -87,6 +87,7 @@ class FriendSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendList
         exclude = ('user',)
+    
 
     def get_friend(self, obj):
         user = self.context['user']
@@ -137,6 +138,13 @@ class RemoveSubscriptionSerializer(serializers.Serializer):
         return attrs
 
 class DisableSubscriptionSerializer(serializers.Serializer):
+    msisdn = serializers.CharField()
+    
+    def validate(self, attrs):
+        msisdn = attrs.get('msisdn')
+        return attrs
+    
+class ExpiryOnRenewalSerializer(serializers.Serializer):
     msisdn = serializers.CharField()
     
     def validate(self, attrs):

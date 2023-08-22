@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from django.contrib import admin
 from django.urls import path
-
-class MyAdminSite(admin.AdminSite):
+from django.contrib.auth.forms import AuthenticationForm
+from django import forms
+    
+class MyAdminSite(admin.AdminSite): 
     def get_urls(self):
         urls = super().get_urls()
         my_urls = [
@@ -30,3 +32,4 @@ class MyAdminSite(admin.AdminSite):
         return render(request, 'admin/iframes/generalreport.html')
     def redeemedprizes_dash_view(self, request):
             return render(request, 'admin/iframes/redeemedprizes.html')
+

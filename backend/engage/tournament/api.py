@@ -19,12 +19,16 @@ from engage.settings.base import API_SERVER_URL
 import requests
 
 
+
+from django.http import JsonResponse
+from django.utils import timezone
+
 from engage.account.exceptions import (
     GameAccountUnavailable,
     MinimumProfileLevelException
 )
 from .constants import TournamentState
-from .exceptions import ParticipantExists, FreeUserCannotJoinTournament,TournamentCloseException,TournamentFirstException,TournamentStartException,UserInformException,UnbilledUserCannotJoinTournament
+from .exceptions import ParticipantExists, FreeUserCannotJoinTournament,TournamentCloseException,TournamentFirstException,TournamentStartException,UserInformException,UnbilledUserCannotJoinTournament,TournamentGetPrizeException
 from .models import (
     Tournament,
     TournamentParticipant,
@@ -40,6 +44,9 @@ from .serializers import (
 from ..tournament.models import get_prize
 from ..core.models import Sticker
 from ..operator.constants import SubscriptionType
+
+import logging 
+
 
 def send_sms(user, message, vault=None):
     headers = {'Content-type':'application/json', 
@@ -73,6 +80,23 @@ def send_sms(user, message, vault=None):
     else:
         return api_call.content, api_call.status_code
 
+def test_page():
+    headers = {'Content-type':'application/json', 
+                'accept': 'text/plain'} # post data
+    command = '/api/User/test'
+    url = API_SERVER_URL+command
+    
+    try:
+        api_call = requests.post(url, headers=headers,timeout=2)
+    except requests.exceptions.RequestException as e:
+        print(e)
+        return 'Server error', 555
+    if api_call.status_code==200:
+        res = api_call.json()['statusCode']
+        return res['message'], res['code']
+    else:
+        return api_call.content, api_call.status_code
+    
 class TournamentFilter(django_filters.FilterSet):
     state = django_filters.ChoiceFilter(choices=TournamentState.choices,
                                         method='filter_state')
@@ -107,54 +131,11 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
     lookup_field = 'slug'
 
 
-    # def get_queryset(self):
-    #     user = self.request.user
-    #     now = timezone.now()
-    #     queryset = self.queryset.filter(regions__in=[self.request.region])
-
-    #     if self.action in ['start', 'join']:
-    #         return queryset.all()
-
-    #     state = self.request.query_params.get('state', TournamentState.UPCOMING)
-        
-    #           # if user.is_authenticated :
-    #         # queryset = queryset.filter(Q(open_date__lte=now) |
-    #         #                            Q(Q(minimum_profile_level__lte=user.level) | Q(minimum_profile_level__isnull=True))
-                                       
-    #         # ).order_by('open_date')
-        
-    #     if not user.is_authenticated:
-    #         queryset = queryset.filter(
-    #             free_open_date__lte=now,
-    #         ).order_by('free_open_date')
-            
-    #     # if not user.is_subscriber:
-    #     else :
-    #         queryset = queryset.annotate(
-    #             is_min_level=Case(
-    #                 When(Q(minimum_profile_level__isnull=False) &
-    #                      Q(minimum_profile_level__gt=user.level),
-    #                      then=False),
-    #                 default=True
-    #             )
-    #         ).filter(
-    #              Q(free_open_date__lte=now) |
-    #             (Q(Q(minimum_profile_level__lte=user.level) | Q(minimum_profile_level__isnull=True)) & Q(free_open_date__gt=now))
-    #         ).order_by('free_open_date')
-
-    #     if self.action == 'list':
-    #         if state == TournamentState.UPCOMING:
-    #             return queryset.filter(end_date__gte=now)
-    #         else:
-    #             return queryset.filter(end_date__lt=now)
-    #     else:
-    #         return queryset.all()
-
     def get_queryset(self):
         user = self.request.user
         now = timezone.now()
         queryset = self.queryset.filter(regions__in=[self.request.region])
-       
+
 
         if self.action in ['start', 'join', 'close']:
             return queryset.all()
@@ -164,7 +145,7 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         if game != '0' :
             queryset = queryset.filter(game__id=int(game))
         
-        # if user.is_authenticated :
+              # if user.is_authenticated :
             # queryset = queryset.filter(Q(open_date__lte=now) |
             #                            Q(Q(minimum_profile_level__lte=user.level) | Q(minimum_profile_level__isnull=True))
                                        
@@ -175,6 +156,7 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                 free_open_date__lte=now,
             ).order_by('free_open_date')
             
+        # if not user.is_subscriber:
         else :
             queryset = queryset.annotate(
                 is_min_level=Case(
@@ -187,7 +169,6 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                  Q(free_open_date__lte=now) |
                 (Q(Q(minimum_profile_level__lte=user.level) | Q(minimum_profile_level__isnull=True)) & Q(free_open_date__gt=now))
             ).filter(open_date__lte=now).order_by('free_open_date')
-        
 
         if self.action == 'list':
             if state == TournamentState.UPCOMING:
@@ -200,7 +181,8 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
                 tournaments =  queryset.all() 
         else:
             tournaments =  queryset.all() 
-       
+
+    
         return  tournaments  
 
             
@@ -240,6 +222,7 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
     @action(methods=['GET'], detail=True, permission_classes=(permissions.IsAdminUser,))
     @transaction.atomic()
     def close(self, request, slug):
+        is_closed = False
         tournament = self.get_object()
         
 
@@ -257,12 +240,19 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
             else:
                 prize = tournament_prize.actual_data_package
             if not get_prize(winner.mobile, prize, prize_type, winner.subscription,tournament.id):
-                raise TournamentCloseException()
-
+                is_closed = True
+                
+            
+        
         tournament.end_date = timezone.now()
         tournament.closed_on = timezone.now()
         tournament.save()
         tournament.send_notification_close()
+        if is_closed == True:
+           return Response(
+                {"detail": "Tournament closed but error in granting prizes, please check with technical team!"},
+                status=status.HTTP_406_NOT_ACCEPTABLE
+            )
         return redirect(request.META["HTTP_REFERER"])
 
 
@@ -388,7 +378,8 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         elif state == TournamentState.ONGOING:
             tournaments = ongoing
         else:
-            tournaments = list(exceptprevioustournaments) + list(previous) # tournament_list.all().order_by('id')  # added order to remove warning
+            tournaments = list(exceptprevioustournaments)  # tournament_list.all().order_by('id')  # added order to remove warning
+
         
         paginator = Paginator(tournaments, page_size)
         all_paginator = Paginator(exceptprevioustournaments, page_size)
@@ -543,6 +534,9 @@ def gettour(user,tournament_list,region):
 
 
 
+def get_event_datetime(request):
+    event_datetime = timezone.datetime(2023, 5, 10, 12, 0, tzinfo=timezone.utc)
+    return JsonResponse({"event_datetime": event_datetime.isoformat()})
     
  
    
@@ -602,7 +596,7 @@ class TournamentWinnerViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
 
     def list(self, request, *args, **kwargs):
        
-        game = request.query_params['game']
+        game = request.query_params.get('game',None)
         tournament = request.query_params.get('tournament', None)
 
         

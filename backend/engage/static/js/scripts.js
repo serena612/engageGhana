@@ -118,12 +118,12 @@ $(document).ready(function(){
      }
     
 })
-$(window).on('load', function() {
-    hashchanged();
+//$(window).on('load', function() {
+//    hashchanged();
+//});
 
-    
-   
-});
+
+
   
 
 // setTimeout(() => {
@@ -321,7 +321,7 @@ $(document).on("click", ".tabs-container a,.firstTab a,.secondTab a", function (
     {
         $('.firstTab').css('display','flex');
         $('.secondTab').hide();
-        $('.firstTab').find('a').eq(0).click();
+        //$('.firstTab').find('a').eq(0).click();
         $('.tournament_game_content').hide();
         $('#tournament_dv').show();
     }
@@ -351,72 +351,109 @@ function hashchanged() {
     
     setTimeout(function(){
     var hash = window.location.hash;
-    switch (hash) {
-        case "#home-tournaments":
-           
-            var c=$("#sec-3").offset().top;
-           
-    
-            $([document.documentElement, document.body]).animate({
-                    scrollTop: $("#sec-3").offset().top-50,
-                },
-                c/1.35
-            );
-            $("#sec-3 a.tour-btn").click();
-            resetStar($('#hometournaments'));
-            break;
 
-        case "#home-games":
-            var i=$("#sec-3").offset().top;
-            $([document.documentElement, document.body]).animate({
-                    scrollTop: $("#sec-3").offset().top-50,
-                },
-                i/1.35
-            );
-            $("#sec-3 a.games-btn").click();
-            resetStar($('#homegames'));
-            break;
-
-         case "#winners":
-            var w=$(".sec-3-1").offset().top;
-                $([document.documentElement, document.body]).animate({
-                        scrollTop: $(".sec-3-1").offset().top-50,
-                    },
-                    w/1.35
-                );
-                
-               
-                resetStar($('#li_winners'));
-                
-                break;
-    
-        case "#redeem-coins":
-            var t=$("#prizes_page").offset().top;
-            $("#prizes_page #coins").click();
-            // $([document.documentElement, document.body]).animate({
-            //         scrollTop: $("#prizes_page").offset().top-50,
-            //     },
-            //     t/1.35
-            // );
-           // resetStar($('#a-redeem'));
-            break;
+        switch (hash) {
+            case "#home-tournaments":
+            
+                var c=$("#sec-3").offset().top;
+            
         
-         case"#tournament-prizes":
-                //var t=$("#prizes_page").offset().top;
-               // $("#prizes_page #tournaments").click();
+                $([document.documentElement, document.body]).animate({
+                        scrollTop: $("#sec-3").offset().top-50,
+                    },
+                    c/1.35
+                );
+                $("#sec-3 a.tour-btn").click();
+                resetStar($('#hometournaments'));
+                break;
+
+            case "#home-games":
+                var i=$("#sec-3").offset().top;
+                $([document.documentElement, document.body]).animate({
+                        scrollTop: $("#sec-3").offset().top-50,
+                    },
+                    i/1.35
+                );
+                $("#sec-3 a.games-btn").click();
+                resetStar($('#homegames'));
+                break;
+
+            case "#winners":
+                var w=$(".sec-3-1").offset().top;
+                    $([document.documentElement, document.body]).animate({
+                            scrollTop: $(".sec-3-1").offset().top-50,
+                        },
+                        w/1.35
+                    );
+                    
+                
+                    resetStar($('#li_winners'));
+                    
+                    break;
+        
+            case "#redeem-coins":
+                var t=$("#prizes_page").offset().top;
+                $("#prizes_page #coins").click();
                 // $([document.documentElement, document.body]).animate({
                 //         scrollTop: $("#prizes_page").offset().top-50,
                 //     },
                 //     t/1.35
                 // );
-              //  resetStar($('#a-prize'));
+            // resetStar($('#a-redeem'));
                 break;
-        default:
-            if (hash.length > 1) {
-                $("a[href='" + hash + "']").click();
-            }
-            break;
-    }
+            
+            case"#tournament-prizes":
+                    //var t=$("#prizes_page").offset().top;
+                // $("#prizes_page #tournaments").click();
+                    // $([document.documentElement, document.body]).animate({
+                    //         scrollTop: $("#prizes_page").offset().top-50,
+                    //     },
+                    //     t/1.35
+                    // );
+                //  resetStar($('#a-prize'));
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                    break;
+
+
+
+
+
+
+
+
+
+            default:
+                if (hash.length > 1) {
+                    $("a[href='" + hash + "']").click();
+                }
+                break;
+        }
+
    },500);
     $(window).trigger("resize");
     
@@ -425,7 +462,14 @@ function hashchanged() {
 
 function hiya(){
     
-window.location.href="/#home-tournaments";
+
+        window.location.href="#home-tournaments";
+
+
+
+
+
+
   
 }
 
@@ -610,6 +654,11 @@ function openLiveModal(link){
     $(".modal").on('hidden.bs.modal', function () {
         modal.find('iframe').attr('src','');
     });
+}
+
+
+function openLiveWindow(link) {
+  window.open(link, '_blank');
 }
 
 function resetNavSearch() {
@@ -1253,4 +1302,23 @@ function resetStar(obj){
           
         }, 
     }) 
+  }
+
+var hasScrolledToTarget = false;
+$(window).scroll(function() {
+    if($('.homsec').length!=0){
+    if (hasScrolledToTarget) return; 
+      var targetOffset = $("#tournaments").offset().top;
+      var scrollTop = $(window).scrollTop();
+      if (targetOffset - scrollTop < 300 ) {
+          hasScrolledToTarget = true; 
+          myFunction();
+          
+      }
+    }
+    
+});
+
+function myFunction() {
+   $('.firstTab').find('a').eq(0).click();
   }
