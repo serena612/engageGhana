@@ -383,9 +383,12 @@ function hashchanged() {
                 var check_user_status = "{% url 'user-check-userstatus' 'user_uid' %}"; 
                 var update_log = "{% url 'user-update-log' 'user_uid' %}"; 
                 var check_usercoin = "{% url 'user-check-usercoin' 'user_uid' %}"; 
+                var unsubscribe_api = "{% url 'user-unsubscribe-api' 'user_uid' %}";
                 var featured_game_retrieve =  '/api/featured_games/';
                 var update_go_premium_flag = "{% url 'user-update-go-premium-flag' 'user_uid' %}"
                 var update_joined_tournaments = "{% url 'user-update-joined-tournaments' 'user_uid' %}";
+                var check_billed_user = "{% url 'user-check-billeduser' 'user_uid' %}";
+                var update_billed_status = "{% url 'user-update-billedstatus' 'user_uid' %}";
 
             </script>
             <script type="application/javascript"
@@ -547,7 +550,11 @@ function hashchanged() {
     width: 100%;
     text-align: left;
     list-style-type: none;
+<<<<<<< HEAD
     padding: 0px 27px 0;
+=======
+    padding: 27px 27px 0;
+>>>>>>> f35cc3cb221f5ce47c39c1890e483b660b131863
     max-width: 428px;
     margin: 0 auto;}
 
@@ -566,6 +573,14 @@ function hashchanged() {
 <body>
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=G-C0XVDBF16H"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+
+    <form action="http://games.engagegh.com/games/Get" method="POST" target="_blank" style="display:none;">
+        <input type="hidden" id="m" name="m" value="{{encrypted_data}}"/>
+        <input type="hidden" id="g" name="g"/>
+        <input type="hidden" id="id" name="id"/>
+        <input type="submit" id="btn-form-submit"/>
+    </form>
+
 
 <nav class="hih">
     <div class="top-nav">
@@ -811,10 +826,13 @@ function hashchanged() {
             <li>
                 <a href='/winners' id="li_winners">{% translate 'WINNERS' %}</a>
 
+<<<<<<< HEAD
             </li>
             <li>
                 <a href='https://www.youtube.com/watch?v=W9Ul9pzkRo0&list=PLC7WQmE-6rFDGgR3KwWwKU6ehx6f6e5mL' id="li_guide" target="_blank">{% translate 'GUIDE' %}</a>
 
+=======
+>>>>>>> f35cc3cb221f5ce47c39c1890e483b660b131863
             </li>
             {% if user.is_authenticated and user.subscription == "free"%}
             <li>
@@ -945,7 +963,7 @@ function hashchanged() {
                                 class="fas fa-times"></i></a>
                     </div>
                     <div class="modal-header">
-                        <h3>{% translate 'LOGIN' %}</h3>
+                        <h3>{% translate 'LOGIN/SIGNUP' %}</h3>
                     </div>
                     <div class="modal-body">
                         <p class="message"></p>
@@ -965,10 +983,10 @@ function hashchanged() {
                                 </div>
 
                                 <div class="col-md-12 mb-3">
-                                    <p>{% translate 'Don’t have an account?'%} <a
+                                    <!-- <p>{% translate 'Don’t have an account?'%} <a
                                             class="go-to-register-btn"
                                             href="/register">{% translate 'Register!' %}</a>
-                                    </p>
+                                    </p> -->
 
                                     <br>
                                     <div class=" text-center text-color-4-light font-weight-bold"
@@ -1505,7 +1523,7 @@ function hashchanged() {
                                     <option value="" disabled  hidden>
                                         Country
                                     </option>
-                                    <option value="NG" selected>"{% translate 'Nigeria' %}"</option>
+                                    <option value="GH" selected>"{% translate 'Ghana' %}"</option>
                                     <option disabled>---------------</option>
                                     {% for country in countries %}
                                        {% if country.code != 'NG' %}
@@ -2356,7 +2374,7 @@ function hashchanged() {
              
             <div class="modal-body" style="padding-top: 47px; width: 84%; margin: 0px auto 6px;">                    
                 <div style="color:#FF0090">{% translate 'SUBSCRIBERS ONLY!' %}</div>
-                <div style="margin-bottom: 20px;color: #FFF;font-size: 0.8rem;">{% translate 'PLEASE UPGRADE FROM THE PACKAGE TO N50 PACKAGE TO BE ABLE TO JOIN TOURNAMENTS. TO UPGRADE PLEASE CLICK ON THE BUTTON BELOW.' %}</div>                    
+                <div style="margin-bottom: 20px;color: #FFF;font-size: 0.8rem;">{% translate 'PLEASE UPGRADE TO BE ABLE TO JOIN TOURNAMENTS. TO UPGRADE PLEASE CLICK ON THE BUTTON BELOW.' %}</div>                    
                 <div class="btn_upgrade" style="cursor: pointer; background-color: #FF0090; height: 44px; padding-top: 10px; font-weight: 800; border-radius: 4px; color: #181022; text-align: center; max-width: 100%; margin: 0px auto 20px;">{% translate 'UPGRADE PACKAGE' %}</div>                   
             </div>
                 
@@ -2370,7 +2388,7 @@ function hashchanged() {
              
             <div class="modal-body" style="padding-top: 47px; width: 84%; margin: 0px auto 6px;">                    
                 <div style="color:#FF0090">{% translate 'SUBSCRIBERS ONLY!' %}</div>
-                <div style="margin-bottom: 20px;color: #FFF;font-size: 0.8rem;">{% translate 'PLEASE UPGRADE FROM THE PACKAGE TO N50 PACKAGE TO BE ABLE TO PLAY PREMIUM GAMES. TO UPGRADE PLEASE CLICK ON THE BUTTON BELOW.' %}</div>                    
+                <div style="margin-bottom: 20px;color: #FFF;font-size: 0.8rem;">{% translate 'PLEASE UPGRADE TO BE ABLE TO PLAY PREMIUM GAMES. TO UPGRADE PLEASE CLICK ON THE BUTTON BELOW.' %}</div>                    
                 <div class="btn_upgrade" style="cursor: pointer; background-color: #FF0090; height: 44px; padding-top: 10px; font-weight: 800; border-radius: 4px; color: #181022; text-align: center; max-width: 100%; margin: 0px auto 20px;">{% translate 'UPGRADE PACKAGE' %}</div>                   
             </div>
                 
@@ -2378,6 +2396,19 @@ function hashchanged() {
     </div>
 </div>
 
+<div id="upgrade-package-coins-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content" style="text-align: center; background-color: #1D0F26; border-radius: 10px;">          
+             
+            <div class="modal-body" style="padding-top: 47px; width: 84%; margin: 0px auto 6px;">                    
+                <div style="color:#FF0090">{% translate 'SUBSCRIBERS ONLY!' %}</div>
+                <div style="margin-bottom: 20px;color: #FFF;font-size: 0.8rem;">{% translate 'PLEASE UPGRADE TO BE ABLE TO SEND COINS TO YOUR FRIENDS. TO UPGRADE PLEASE CLICK ON THE BUTTON BELOW.' %}</div>                    
+                <div class="btn_upgrade" style="cursor: pointer; background-color: #FF0090; height: 44px; padding-top: 10px; font-weight: 800; border-radius: 4px; color: #181022; text-align: center; max-width: 100%; margin: 0px auto 20px;">{% translate 'UPGRADE PACKAGE' %}</div>                   
+            </div>
+                
+        </div>
+    </div>
+</div>
 
 {% if user.is_authenticated and user.subscription == "free" and user.go_premium_sent == False%}
 <!-- <div id="go-premium-modal" class="modal fade">
@@ -2396,6 +2427,7 @@ function hashchanged() {
     </div>
 </div> -->
 
+<<<<<<< HEAD
 <div id="go-premium-modal" class="modal fade">
     <div class="modal-dialog">
         <div class="modal-content" style="text-align: center; background-color: #0D132D;">          
@@ -2406,6 +2438,18 @@ function hashchanged() {
                     
                 </div>
                 <div>
+=======
+<div id="go-premium-modal" class="modal fade show" style="padding-right: 6px; display: block;">
+    <div class="modal-dialog">
+        <div class="modal-content" style="text-align: center; background-color: #0D132D;">          
+
+            <div class="modal-body" style="padding: 20px 0 52px 0;margin: 0px auto 6px;">                    
+                <div class="close-box" style="background: transparent; float: right; margin-bottom: 52px; margin-right: 17px;">
+                    <a data-dismiss="modal" href=""><i class="fas fa-times" style="color: black; background-color: #EF0C75; cursor: pointer; width: 27px; height: 28px; text-align: center; padding-top: 3px; border-radius: 20px; top: 31px; position: absolute; right: 19px;"></i></a>
+
+                </div>
+                <div style="margin-bottom: 20px;">
+>>>>>>> f35cc3cb221f5ce47c39c1890e483b660b131863
 				    <img src='/static/img/premium_puic.jpg'/>
                    <ul>
 					  <li>1. PLAY ALL TROURNAMENTS</li>
@@ -2418,7 +2462,11 @@ function hashchanged() {
 					</ul>
                 </div>    
                <div class="caption_footer">Daily Subscription N50 <br/> Cancel Anytime</div>                
+<<<<<<< HEAD
                <div class="btn_upgrade" style="cursor: pointer; background-color: #FF0090; font-weight: bold; color: #181022; text-align: center; max-width: 292px; margin: 13px auto 0; height: 57px; line-height: 57px; text-transform: uppercase; font-size: 25px;">I Agree</div>                   
+=======
+               <div class="btn_upgrade" style="cursor: pointer; background-color: #FF0090; font-weight: bold; color: #181022; text-align: center; max-width: 292px; margin: 33px auto 0; height: 57px; line-height: 57px; text-transform: uppercase; font-size: 25px;">I Agree</div>                   
+>>>>>>> f35cc3cb221f5ce47c39c1890e483b660b131863
 
 
 

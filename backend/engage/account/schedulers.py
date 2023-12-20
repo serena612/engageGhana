@@ -195,6 +195,6 @@ def update_joined_tournaments(self):
         return
     users = User.objects.all()
     for user in users:
-        if user.tournament_joined_today == True:
+        # if user.tournament_joined_today == True:
             user.tournament_joined_today = False
             user.save()

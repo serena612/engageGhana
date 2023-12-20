@@ -45,6 +45,9 @@ class TournamentPrizeType(LabelChoices):
     CASH = 'cash', 'Cash'
     # TICKETS = 'tickets', 'Tickets'
     DATA = 'data', 'Data'
+    OTHERS = 'others', 'Others'
+    AIRTIME = 'airtime', 'Airtime'
+
 
 
 class RoundNumber(LabelChoices):

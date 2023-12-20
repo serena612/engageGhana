@@ -51,8 +51,10 @@ def send_sms(user, message, vault=None):
         subs = SubscriptionPackages.FREE
     elif user.subscription==SubscriptionPlan.PAID1:
         subs = SubscriptionPackages.PAID1
-    else:
+    elif user.subscription==SubscriptionPlan.PAID2:
         subs = SubscriptionPackages.PAID2
+    else:
+        subs = SubscriptionPackages.PAID3
     data = {
             'msisdn': user.mobile,
             'message': message.replace('<br/>', ''),
@@ -128,8 +130,8 @@ def fill_prize_list(self):
 @shared_task(bind=True)
 def fetch_match_details(self, match_id):
     prefix = "fetch_match_details_"+ str(match_id)
-    if block_multiple_celery_task_execution(self, prefix):
-        return
+    # if block_multiple_celery_task_execution(self, prefix):
+    #     return
     match = TournamentMatch.objects.get(
         id=match_id
     )

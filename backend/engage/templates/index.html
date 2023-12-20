@@ -121,8 +121,28 @@
 {% endblock %}
 
 {% block top_section %}
+    {% if user.subscription == "free" or not user.is_billed %}
+    <section class="sec-1 homsec" onclick="$('#upgrade-package-modal').modal('show')"
+    style="background-image: url('{{ operator.operatorwebsite.first_section_image.url }}'); height:auto!important; padding:0px; cursor: pointer;margin-top:10px;">
+
+    <img src="{{ operator.operatorwebsite.first_section_image.url }}" id="deskImg" title="Engage"/>
+    <img src="{{ operator.operatorwebsite.second_section_image.url  }}" id="mobileImg" title="Engage"/>
+<div class="text-container max-page-width" style="display: none;">
+   <div class="title-home">
+   {{ operator.operatorwebsite.first_section_description|safe }}
+</div>
+   <!-- <a class="btn1 home-btn-main"
+      href="{{ operator.operatorwebsite.first_section_url }}">
+       {{ operator.operatorwebsite.first_section_button_title }}
+   </a> -->
+</div>
+</section>
+
+{% else %}
+
     <section class="sec-1 homsec" onclick="window.location.href='{{ operator.operatorwebsite.first_section_url }}'"
              style="background-image: url('{{ operator.operatorwebsite.first_section_image.url }}'); height:auto!important; padding:0px; cursor: pointer;margin-top:10px;">
+
              <img src="{{ operator.operatorwebsite.first_section_image.url }}" id="deskImg" title="Engage"/>
              <img src="{{ operator.operatorwebsite.second_section_image.url  }}" id="mobileImg" title="Engage"/>
         <div class="text-container max-page-width" style="display: none;">
@@ -135,6 +155,9 @@
             </a> -->
         </div>
     </section>
+    {% endif %}
+    
+
 {% endblock %}
 
 {% block content %}
@@ -248,7 +271,7 @@
                            data-link-android="{{ game.android_link }}"
                            data-link-ios="{{ game.ios_link }}"
                            data-link-pc="{{ game.pc_link }}" target="_blank">
-                            <img src="{{ game.logo.url }}" alt="">
+                            <img src="{{ game.logo.url }}" alt="" class="lazy">
                         </a>
                     </div>
                 {% endfor %}
@@ -256,7 +279,11 @@
                 {% for game in featured_games %}
                     <div class="featured-item">
                         <a class="featured-game" href="" data-toggle="modal" data-target="#login-modal">
+
                             <img src="{{ game.logo.url }}" data-src="{{ game.logo.url }}" alt="">
+
+
+
                         </a>
                     </div>
                 {% endfor %}
@@ -282,7 +309,11 @@
                     {% for game in featured_games %}
                         <div class="featured-item swiper-slide">
                             <a class="featured-game" href="" data-toggle="modal" data-target="#login-modal">
+
                                 <img src="{{ game.logo.url }}" data-src="{{ game.logo.url }}" alt="">
+
+
+
                             </a>
                         </div>
                     {% endfor %}
@@ -612,7 +643,8 @@
                         <div class="col-md-12 mb-3">
                             {% if user.is_authenticated %}
                             <input type="text" class="input1 share-link-input"
-                                   value="https://www.engageplaywin.com/register?referrer={{ user.uid }}"
+                                    value="https://www.engagegh.com/"
+                                   <!-- value="https://www.engageplaywin.com/register?referrer={{ user.uid }}" -->
                                    readonly>
                             {% else %}
                             <input type="text" class="input1 share-link-input"
@@ -625,9 +657,9 @@
                                     {% translate 'COPY' %}
                                 </button>
                                 {% if user.is_authenticated %}
-                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engageplaywin.com/register?referrer={{ user_uid }}"></div><!-- ShareThis END -->
+                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engagegh.com/"></div><!-- ShareThis END -->
                                 {% else %}
-                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engageplaywin.com/register"></div><!-- ShareThis END -->
+                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engagegh.com/"></div><!-- ShareThis END -->
                                 {% endif %}
                             </div>
                         </div>

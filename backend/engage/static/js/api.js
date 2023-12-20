@@ -118,6 +118,30 @@ function postLoginOTP(data) {
     });
 }
 
+function postLoginNewUser(data) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: '/api/auth/login_new_user/',
+            headers: {
+                "X-CSRFToken": xtoken,
+            },
+            type: "post",
+            data: {
+                code: data.code,
+                mobile:data.mobile,
+                csrfmiddlewaretoken: data.csrfmiddlewaretoken
+            },
+            error: function (value) {
+                reject(value);
+            },
+            success: function (value) {
+                location.reload();
+                resolve(value);
+            },
+        });
+    });
+}
+
 // register phone
 function postRegister(data) {
 
@@ -257,7 +281,7 @@ function fillTopUpcomingTournaments(data){
             <div class="newsbv-item `+state+`">
                 <div class="newsb-thumbnail">
                     <a rel="bookmark"
-                    href="/tournaments/${item.slug}">
+                    href="/tournaments/${item.slug}" id="image-click">
                         <img src="${item.image}"
                             alt="${item.slug}">
                         <span class="overlay-link"></span>
@@ -282,7 +306,8 @@ function fillTopUpcomingTournaments(data){
                     </div>
                 </div>`;
               
-                
+        
+
                 html+=`<p class="post-meta">
                    <i class="fas fa-clock"></i>
                    <i class="fas fa-users"></i>
@@ -316,6 +341,7 @@ function fillTopUpcomingTournaments(data){
           
     });
 }
+
 
 function convertDateToUTC(date) { return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), date.getUTCHours(), date.getUTCMinutes(), date.getUTCSeconds()); }
 function load (pg) {
@@ -407,7 +433,7 @@ function load (pg) {
                             <div class="newsbv-item `+state+`">
                                 <div class="newsb-thumbnail">
                                     <a rel="bookmark"
-                                    href="/tournaments/${item.slug}">
+                                    href="/tournaments/${item.slug}" id="image-click">
                                         <img src="${item.image}"
                                             alt="${item.slug}">
                                         <span class="overlay-link"></span>
@@ -531,7 +557,7 @@ function load (pg) {
                             <div class="newsbv-item `+state+`">
                                 <div class="newsb-thumbnail">
                                     <a rel="bookmark"
-                                    href="/tournaments/${item.slug}">
+                                    href="/tournaments/${item.slug}" id="image-click">
                                         <img src="${item.image}"
                                             alt="${item.slug}">
                                         <span class="overlay-link"></span>
@@ -767,7 +793,7 @@ function get_tournament(game,str) {
                             <div class="newsbv-item  tour_${item.id}  `+state+`">
                                 <div class="newsb-thumbnail">
                                     <a rel="bookmark"
-                                    href="/tournaments/${item.slug}">
+                                    href="/tournaments/${item.slug}" id="image-click">
                                         <img src="${item.image}"
                                             alt="${item.slug}">
                                         <span class="overlay-link"></span>
@@ -913,7 +939,7 @@ function get_tournament(game,str) {
                             <div class="newsbv-item `+state+`">
                                 <div class="newsb-thumbnail">
                                     <a rel="bookmark"
-                                    href="/tournaments/${item.slug}">
+                                    href="/tournaments/${item.slug}" id="image-click">
                                         <img src="${item.image}"
                                             alt="${item.slug}">
                                         <span class="overlay-link"></span>
@@ -1159,6 +1185,22 @@ function showVideoAd(){
     if($('#userSub').val() == "free")
        $('#page-content').show(); 
 }
+
+$(document).ready(function(){
+    $(document).on('click', '#image-click', function (e) {
+    e.preventDefault(); 
+    
+    if($('#userSub').val() == "free")
+    {
+        $('#upgrade-package-modal').modal('show');
+    } 
+    else 
+    {
+        // Redirect to the URL specified in the href attribute
+        window.location.href = $(this).attr('href');
+    }
+});
+});
 
 var html5games_ajax = null;
 // get html5 games

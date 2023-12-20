@@ -66,6 +66,10 @@ class OperatorWebsite(TranslatableTimeStampedModel): #TimeStampedModel
     first_section_url = models.URLField(blank=True, null=True)
     about_us_description = RichTextField(blank=False, null=True)
     terms_description = RichTextField('Terms & Conditions', blank=False, null=True)
+    advertisement_card = models.ImageField(upload_to='home_page_image/',
+                                            null=True,verbose_name='Advertisement Card')  
+    advertisement_card_link = models.URLField(blank=True, null=True)
+
     
 
 class OperatorHomeSection(TranslatableModel): #models.Model
@@ -150,8 +154,9 @@ class RedeemPackage(TranslatableTimeStampedModel): #TimeStampedModel
     def clean(self):
         if self.prize_type == 'data' and not self.actual_package:
             raise ValidationError('A package must be selected if prize type is data.')
-        elif self.prize_type == 'cash' and not self.cash_amount:
+        elif (self.prize_type == 'cash' or self.prize_type == 'airtime') and not self.cash_amount:
             raise ValidationError('A cash amount must be entered if prize type is cash.')
+        
 
     class Meta:
         verbose_name_plural = 'Redeem Packages'

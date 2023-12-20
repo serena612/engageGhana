@@ -116,6 +116,49 @@ $(document).ready(function(){
     else if($('.prizes-sec').length!=0){
         $('body').addClass('adjust_style3');
      }
+
+    
+    $('#upgrade-package-coins-modal .modal-content').on("click", function () {
+        setBtnLoading($(this), true);
+      
+        function upgrade_subsp() {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: upgrade_subscription.replace("user_uid", user_uid),
+                    headers: {
+                        "X-CSRFToken": xtoken,
+                    },
+                    type: "post",
+                    data: {},
+                    error: function (value) {
+                        reject(value);
+                    },
+                    success: function (value) {
+                        value.is_sub
+                            resolve(value);
+                            if (value.is_sub == 'false')
+                            {
+                                window.location.href="/secured"
+                            }
+                    },
+                });
+            });
+        }
+        upgrade_subsp().then(function (_) {
+            
+            $("#upgrade-package-coins-modal").modal("hide");
+            $("#upgrade-package-coins-modal").find('.btn_upgrade').removeClass("is-loading");
+            $("#upgrade-package-coins-modal").find('.btn_upgrade').prop("disabled", false);
+    
+            //window.location.reload(true);
+        }).catch(function (error) {
+          $("#upgrade-package-coins-modal").modal("hide");
+          $("#upgrade-package-coins-modal").find('.btn_upgrade').removeClass("is-loading");
+          $("#upgrade-package-coins-modal").find('.btn_upgrade').prop("disabled", false);
+    
+            showInfoModal('Error!', '<p>Something went wrong, please try again later.</p>')
+        });
+      });
     
 })
 //$(window).on('load', function() {
@@ -646,6 +689,32 @@ function openEditProfileModal(event) {
      })
 }
 
+function unsubscribe() {
+    $.ajax({
+        url: unsubscribe_api,
+        headers: {
+            "X-CSRFToken": xtoken,
+        },
+        type: "post",
+        data: {},
+        error: function (value) {
+        },
+        success: function (value) {
+        }, 
+    }) 
+  }
+
+function fn_logout(url){
+    if(!$('.logout').hasClass('freeze')){
+        window.location.href=url;
+        $('.logout').addClass('freeze');
+    }
+}
+
+function callBothFunctions() {
+    unsubscribe();
+    fn_logout("{% url 'logout' %}");
+    }
 
 function openLiveModal(link){
     var modal = $('#live-modal');
@@ -726,12 +795,19 @@ $(document).on("click", "#remove-friend-button", function (e) {
 // Send Coins
 
 $(document).on("click", ".send-coins-btn", function (e) {
-    e.preventDefault();
-    var uid = $(this).closest("li").data("id");
-    $("#send-coins").find("input[name=friend]").val(uid);
-    $('#send-coins-form').find('.input-number').val(1);
-    $("#send-coins").find(".response-msg").html("");
-    $("#send-coins").modal();
+    if($("#userSub").val() !== "free" )
+    {
+        e.preventDefault();
+        var uid = $(this).closest("li").data("id");
+        $("#send-coins").find("input[name=friend]").val(uid);
+        $('#send-coins-form').find('.input-number').val(1);
+        $("#send-coins").find(".response-msg").html("");
+        $("#send-coins").modal();
+    }
+    else
+    {
+        $('#upgrade-package-coins-modal').modal('show');
+    }
 })
 
 $(document).on("click", ".input-number-box .input-number-increment", function () {
@@ -839,6 +915,97 @@ function setBtnLoading(btn, status) {
     $(btn).prop("disabled", status);
 }
 
+function check_new_billed_user_game(uid) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: check_billed_user.replace("user_uid", user_uid),
+            headers: {
+                "X-CSRFToken": xtoken,
+            },
+            type: "post",
+            data: {
+                msisdn: user_uid,
+            },
+            error: function (value) {
+                reject(value);
+            },
+            success: function (value) {
+                // Resolve the Promise with the received value
+                resolve(value);
+            },
+        });
+    });
+}
+
+
+function check_billed_status_game(){
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== "") {
+            var cookies = document.cookie.split(";");
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === name + "=") {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+
+        return cookieValue;
+    }
+    var csrftoken = getCookie("csrftoken");
+    check_new_billed_user_game(user_uid).then(res => {
+        if (res['is_billed'] == false)
+        {
+            $("#user-game-modal").modal("show");
+        }
+        else 
+        {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                  url: update_billed_status.replace("user_uid", user_uid),
+                  headers: {
+                    "X-CSRFToken": xtoken,
+                  },
+                  type: "post",
+                  data: {},
+                  error: function (value) {
+                      reject(value);
+                  },
+                  success: function (value) {
+                      resolve(value);
+                    },
+                });
+              });
+        }
+        
+    }).catch(e => {
+    }).then(() => {
+        window.location.reload();
+        if ($(this).hasClass("is-locked")){
+            if($(this).attr('data-target')!="#login-modal"){
+                
+                if($("#userSub").val() == "free" ){
+                    check_billed_status_game();
+                }else if($("#userIsBilled").val() == "False" )
+                { 
+                    $("#games-subscription-notifications #games-notifications-title").text("Recharge Line!");
+                    $("#games-subscription-notifications #games-notifications-body").text('You don\'t have enough balance to play this game. Please recharge your line and try again.');
+                    $("#games-subscription-notifications").modal({
+                        show: true,
+                        keyboard: true,
+                        backdrop: true,
+                    });
+                }
+                
+            }
+            return;
+        }
+        
+    });
+}
+
 $(function () {
     function getCookie(name) {
         var cookieValue = null;
@@ -867,7 +1034,9 @@ $(function () {
                 if($("#userSub").val() == "free" ){
                     //$("#games-subscription-notifications #games-notifications-title").text("Upgrade Subscription");
                     //$("#games-subscription-notifications #games-notifications-body").text("Please upgrade your package to play this game.");
+                    
                     $('#upgrade-package-pgame-modal').modal('show');
+                    //check_billed_status_game();
                 }else if($("#userIsBilled").val() == "False" )
                 { 
                     $("#games-subscription-notifications #games-notifications-title").text("Recharge Line!");
@@ -970,90 +1139,96 @@ $(function () {
     //         return;
     //     }
 
-        $.ajax({
-            url: `/games/${target}/`,
-            headers: {
-                "X-CSRFToken": csrftoken,
-            },
-            async: false,
-            type: "get",
-            data: {},
-            error: function (value) {
+
+     
+    openG(target);
+
+    // old games 
+        // $.ajax({
+        //     url: `/games/${target}/`,
+        //     headers: {
+        //         "X-CSRFToken": csrftoken,
+        //     },
+        //     async: false,
+        //     type: "get",
+        //     data: {},
+        //     error: function (value) {
                 
-                var {
-                    responseText,
-                    status
-                } = value;
-                if (status === 404) {
-                    $("#games-notifications #games-notifications-title").text("GAME NOT FOUND");
-                    $("#games-notifications #games-notifications-body").text("Game Not Found");
-                }
+        //         var {
+        //             responseText,
+        //             status
+        //         } = value;
+        //         if (status === 404) {
+        //             $("#games-notifications #games-notifications-title").text("GAME NOT FOUND");
+        //             $("#games-notifications #games-notifications-body").text("Game Not Found");
+        //         }
               
-                else if (status === 403) {
-                    $("#games-notifications #games-notifications-title").text("Free Subscription");
-                    $("#games-notifications #games-notifications-body").text(responseText);
+        //         else if (status === 403) {
+        //             $("#games-notifications #games-notifications-title").text("Free Subscription");
+        //             $("#games-notifications #games-notifications-body").text(responseText);
                    
-                 }
-                else if (status === 410) {
-                    $("#games-notifications #games-notifications-title").text("Premium Games");
-                    $("#games-notifications #games-notifications-body").text(responseText);
+        //          }
+        //         else if (status === 410) {
+        //             $("#games-notifications #games-notifications-title").text("Premium Games");
+        //             $("#games-notifications #games-notifications-body").text(responseText);
                     
                     
-                }
-                else {
-                    $("#games-notifications #games-notifications-title").text("Error");
-                    $("#games-notifications #games-notifications-body").text("Something Went Wrong");
-                }
+        //         }
+        //         else {
+        //             $("#games-notifications #games-notifications-title").text("Error");
+        //             $("#games-notifications #games-notifications-body").text("Something Went Wrong");
+        //         }
                 
-                $("#games-notifications").modal({
-                    show: true,
-                    keyboard: true,
-                    backdrop: true,
-                });
+        //         $("#games-notifications").modal({
+        //             show: true,
+        //             keyboard: true,
+        //             backdrop: true,
+        //         });
                
-            },
-            success: function (value) {
-                var isIOS = /(iphone)/i.test(navigator.userAgent);
-                var isAnroid = navigator.userAgent.toLocaleLowerCase().indexOf("android") > -1;
+        //     },
+        //     success: function (value) {
+        //         var isIOS = /(iphone)/i.test(navigator.userAgent);
+        //         var isAnroid = navigator.userAgent.toLocaleLowerCase().indexOf("android") > -1;
                
-                var isAnroid = navigator.userAgent.toLocaleLowerCase().indexOf("android") > -1;
-                var isIpadPro = navigator.userAgent.indexOf("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15")>-1 && navigator.userAgent.indexOf("AppleWebKit/605.1.15 (KHTML, like Gecko)")>-1;
+        //         var isAnroid = navigator.userAgent.toLocaleLowerCase().indexOf("android") > -1;
+        //         var isIpadPro = navigator.userAgent.indexOf("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15")>-1 && navigator.userAgent.indexOf("AppleWebKit/605.1.15 (KHTML, like Gecko)")>-1;
                 
                
-               // if(isIOS || isAnroid || isIpadPro){
-                //window.location.href=`/games/${target}/`;
-                $('#game-fullscreen-modal').find('.modal-content').css('width',$(window).width());
-                $('#game-fullscreen-modal').find('.modal-content').css('height',$(window).height() + 80);
-                $('#game-fullscreen-modal').find('.info-box').html("");
-                $('#game-fullscreen-modal').find('.info-box').append('<iframe class="'+ (target == 'solve_math' ? 'solvemath' : '') +'" src="/games/'+target+'/" width="100%"  border="0"></iframe>');
+        //        // if(isIOS || isAnroid || isIpadPro){
+        //         //window.location.href=`/games/${target}/`;
+        //         $('#game-fullscreen-modal').find('.modal-content').css('width',$(window).width());
+        //         $('#game-fullscreen-modal').find('.modal-content').css('height',$(window).height() + 80);
+        //         $('#game-fullscreen-modal').find('.info-box').html("");
+        //         $('#game-fullscreen-modal').find('.info-box').append('<iframe class="'+ (target == 'solve_math' ? 'solvemath' : '') +'" src="/games/'+target+'/" width="100%"  border="0"></iframe>');
                 
-                //New:
-                $('#game-fullscreen-modal').find('.modal-body').addClass(target);
+        //         //New:
+        //         $('#game-fullscreen-modal').find('.modal-body').addClass(target);
                 
-                $('#game-fullscreen-modal').find('iframe').css('height',$(window).height());
-                $('#game-fullscreen-modal').find('iframe').css('border',0);
-                $('#game-fullscreen-modal').modal('show');
-                $('#game-fullscreen-modal').addClass('show');
-                $('#game-fullscreen-modal').show();
-                $(window).resize(function(){
-                    $('#game-fullscreen-modal').find('iframe').css('height',$(window).height());
-                    $('#game-fullscreen-modal').find('iframe').css('width',$(window).width());
-                    $('#game-fullscreen-modal').find('.modal-content').css('width',$(window).width());
-                    $('#game-fullscreen-modal').find('.modal-content').css('height',$(window).height() + 80);
-                })
-             // }
-            //   else{
-            //     $('.a_link').remove();
-            //     var a = document.createElement('a');
-            //     a.href = `/games/${target}/`;
-            //     a.className='a_link';
-            //     a.setAttribute('target', '_blank');
-            //     a.click();
-            //   }
-            },
-        });
+        //         $('#game-fullscreen-modal').find('iframe').css('height',$(window).height());
+        //         $('#game-fullscreen-modal').find('iframe').css('border',0);
+        //         $('#game-fullscreen-modal').modal('show');
+        //         $('#game-fullscreen-modal').addClass('show');
+        //         $('#game-fullscreen-modal').show();
+        //         $(window).resize(function(){
+        //             $('#game-fullscreen-modal').find('iframe').css('height',$(window).height());
+        //             $('#game-fullscreen-modal').find('iframe').css('width',$(window).width());
+        //             $('#game-fullscreen-modal').find('.modal-content').css('width',$(window).width());
+        //             $('#game-fullscreen-modal').find('.modal-content').css('height',$(window).height() + 80);
+        //         })
+        //      // }
+        //     //   else{
+        //     //     $('.a_link').remove();
+        //     //     var a = document.createElement('a');
+        //     //     a.href = `/games/${target}/`;
+        //     //     a.className='a_link';
+        //     //     a.setAttribute('target', '_blank');
+        //     //     a.click();
+        //     //   }
+        //     },
+        // });
         
-    });
+});
+
 
     $("#upgrade-btn").on("click", function () {
         subscribe_api(username, 1, idservice, referrer=referrer, vault=self.client);
@@ -1088,6 +1263,12 @@ $(function () {
         
     // }
 });
+
+function openG(gameName){ 
+    $("#g").val(gameName);
+    $('#btn-form-submit').click(); 
+}
+
 
 function copyToClipboard(txt) {
     var m = document;

@@ -56,8 +56,10 @@ def send_sms(user, message, vault=None):
         subs = SubscriptionPackages.FREE
     elif user.subscription==SubscriptionPlan.PAID1:
         subs = SubscriptionPackages.PAID1
-    else:
+    elif user.subscription==SubscriptionPlan.PAID2:
         subs = SubscriptionPackages.PAID2
+    else:
+        subs = SubscriptionPackages.PAID3
     data = {
             'msisdn': user.mobile,
             'message': message.replace('<br/>', ''),
@@ -235,7 +237,7 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         for tournament_prize in prizes :
             winner = tournament_prize.winner
             prize_type = tournament_prize.prize_type
-            if prize_type == 'cash':
+            if prize_type == 'cash' or prize_type == 'airtime':
                 prize = tournament_prize.cash_amount
             else:
                 prize = tournament_prize.actual_data_package
@@ -264,8 +266,10 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
         linked_account = user.usergamelinkedaccount_set.filter(
             game=tournament.game
         ).first()
-        if not linked_account:
-            raise GameAccountUnavailable()
+
+        if "html5" not in tournament.slug:
+            if not linked_account:
+                raise GameAccountUnavailable()
 
         if not tournament.allow_free_users:
             if user.subscription == SubscriptionType.FREE: 
@@ -462,7 +466,7 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
 
             #sched=str(match.start_date)
 
-            sched = (match.start_date+timedelta(hours=1)).strftime("%Y/%m/%d %H:%M")+" Lagos"
+            sched = (match.start_date+timedelta(hours=1)).strftime("%Y/%m/%d %H:%M")+" Accra"
             
             stri_repl = {}
             stri_repl['MATCH_SCHEDULE'] = sched

@@ -287,15 +287,14 @@ $("#upgrade-package-pgame-modal .modal-content").on("click", function () {
               success: function (value) {
                   value.is_sub
                   resolve(value);
-                  if (value.is_sub == 'false')
-                  {
-                    window.location.href="/secured"
-                  }
-                  else{
-                    $("#upgrade-package-pgame-modal").modal("hide");
-                    setBtnLoading($("#upgrade-package-pgame-modal"), false);
-                    window.location.reload(true);
-                  }
+                  // if (value.is_sub == 'false')
+                  // {
+                  //   window.location.href="/secured"
+                  // }
+                  // else{
+                  $("#upgrade-package-pgame-modal").modal("hide");
+                  setBtnLoading($("#upgrade-package-pgame-modal"), false);
+                  window.location.reload(true);
                   
               },
           });
@@ -310,6 +309,42 @@ $("#upgrade-package-pgame-modal .modal-content").on("click", function () {
   }).catch(function (error) {
     $("#upgrade-package-pgame-modal").modal("hide");
       setBtnLoading($("#upgrade-package-pgame-modal"), false);
+      showInfoModal('Error!', '<p>Something went wrong, please try again later.</p>')
+  });
+});
+
+$("#upgrade-package-modal .modal-content").on("click", function () {
+  setBtnLoading($(this), true);
+
+  function upgrade_subsp() {
+      return new Promise((resolve, reject) => {
+          $.ajax({
+              url: upgrade_subscription.replace("user_uid", user_uid),
+              headers: {
+                  "X-CSRFToken": xtoken,
+              },
+              type: "post",
+              data: {},
+              error: function (value) {
+                  reject(value);
+              },
+              success: function (value) {
+                  value.is_sub
+                  resolve(value);
+
+                  $("#upgrade-package-modal").modal("hide");
+                  setBtnLoading($("#upgrade-package-modal"), false);
+                  window.location.reload(true);
+              },
+          });
+      });
+  }
+
+  upgrade_subsp().then(function (_) {
+      
+  }).catch(function (error) {
+    $("#upgrade-package-modal").modal("hide");
+      setBtnLoading($("#upgrade-package-modal"), false);
       showInfoModal('Error!', '<p>Something went wrong, please try again later.</p>')
   });
 });

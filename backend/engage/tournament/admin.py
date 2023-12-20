@@ -284,19 +284,16 @@ class TournamentMatchInlineForm(TranslatableModelForm): #forms.ModelForm
             if kwargs['instance'].round_number >1:
                 match_winners = models.TournamentMatch.objects.filter(tournament=kwargs['instance'].tournament).filter(round_number=int(kwargs['instance'].round_number)-1).values_list('winners',flat=True)
                 
-                # print("previous matches winners:", match_winners)
+             
                 self.fields['participants'].queryset = self.fields['participants'].queryset.filter(pk__in=match_winners)
                 self.fields['winners'].queryset = self.fields['winners'].queryset.filter(pk__in=match_winners)
-                # print("query", self.fields['participants'].queryset.query)
-            #print('before',self.fields['participants'].queryset)
+             
             part_round = self.fields['participants'].queryset.filter(Q(participanto__round_number=kwargs['instance'].round_number) & Q(participanto__tournament=kwargs['instance'].tournament)).values_list('pk', flat=True)
             part_match = self.fields['participants'].queryset.filter(participanto=kwargs['instance'].id)
-            #print("participants in same round",part_round)
-            #print("participants in this match", part_match.values_list('pk', flat=True))
+
             self.fields['participants'].queryset = self.fields['participants'].queryset.exclude(pk__in=part_round)
             self.fields['participants'].queryset = self.fields['participants'].queryset | part_match
             # self.fields['participants'].queryset = self.fields['participants'].queryset.exclude((Q(participanto__round_number=kwargs['instance'].round_number) & Q(participanto__tournament=kwargs['instance'].tournament)) & ~Q(participanto=kwargs['instance'].id)).distinct()
-            #print("final participants",self.fields['participants'].queryset)
             self.fields['winners'].queryset = self.fields['winners'].queryset.filter(participanto=kwargs['instance'].id).distinct()
            
         elif 'winners' in self.fields:

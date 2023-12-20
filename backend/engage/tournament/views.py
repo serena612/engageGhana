@@ -85,6 +85,8 @@ def tournament_view(request, slug):
     
     tournament_joined_today = User.objects.filter(username=user.username).values_list('tournament_joined_today', flat=True).first()
 
+    tournament_id = tournament.id
+
     return render(request, 'tournament.html', {'tournament': tournament,
                                                'user': user,
                                                'starts_in_full': starts_in_full,
@@ -94,4 +96,5 @@ def tournament_view(request, slug):
                                                'participant': participant,
                                                'can_join': can_join,
                                                'currentDate':now,
-                                               'tournament_joined_today':tournament_joined_today})
+                                               'tournament_joined_today':tournament_joined_today,
+                                               'tournament_id':tournament_id})

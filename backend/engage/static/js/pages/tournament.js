@@ -132,80 +132,83 @@ $(function () {
 
     //handle set game account form submit
    
-    $("#set-game-account").submit(function (e) {
-        e.preventDefault();
-        var btn = $(this).find("button[type=submit]");
-        setBtnLoading(btn, true);
-        $('#set-game-account').find('.error_msg').html('');
-        var account = $('#set-game-account').find("input[name='account']").val();
-        if(account=="" ||  account.trim()==""){
-            btn.removeClass('is-loading');
-            btn.removeAttr('disabled');
-            $('#set-game-account').find('.error_msg').html('Nickname is not valid!')
-            return;
-        }
-        if(account.length<=1){
-            btn.removeClass('is-loading');
-            btn.removeAttr('disabled');
-            $('#set-game-account').find('.error_msg').html('Nickname length must be greater than 1!')
-            return;
-        }
-        var serializedData = $(this).serialize();
-        $.ajax({
-            type: 'POST',
-            url: set_game_account,
-            headers: {
-                "X-CSRFToken": xtoken,
-            },
-            data: serializedData,
-            success: function (response) {
-                $.ajax({
-                    type: 'POST',
-                    url: tournament_join.replace("$1", tournament_slug),
-                    headers: {
-                        "X-CSRFToken": xtoken,
-                    },
-                    success: function (response) {
-                        $("#user-game-modal").modal("hide");
-                       
-                        if (response.code === 'waiting_list') {
-                            $('#joinStatus').html('<a style="cursor: default" class="disabled">Waiting List</a>');
-                            showInfoModal('Waiting List', '<p>You were added in the waiting list since the tournament is already full. You will be added automatically in case active users left the tournament.</p>')
-                        } else {
-                            update_joinedtrn();
-                            $('#joinStatus').html('<a style="cursor: default">Joined <img src="/static/img/check.svg" class="joined-in" alt=""></a>');
-                            showInfoModal("You're in!", "<p>You have joined the tournament successfully.</p>")
-                        }
-                        //setBtnLoading(btn, false);
-                        $('#info-modal .btn3').click(function(){ location.reload();})
-                       
-                    },
-                    error: function (response) {
-                        $("#user-game-modal").modal("hide");
-                        if(response.responseJSON.code === 'unbilled_user'){
-                            showInfoModal('Recharge Line!', '<p>You don\'t have enough balance to join this tournament. Please recharge your line and try again.</p>');
-                        } else if(response.responseJSON.code === 'free_user'){
-                            showInfoModal('Error!', '<p>This tournament does not accept free users. Please <a href="/register">subscribe to Engage</a> in order to join.</p>');
-                            //$('#upgrade-package-modal').modal('show');
-                        } else if(response.responseJSON.code === 'minimum_profile_level'){
-                            showInfoModal('Error!', '<p>You do not meet the minimum level requirement! Please try joining at a later time.</p>');
-                        } else if(response.responseJSON.code === 'participant_exists'){
-                            showInfoModal('Error!', '<p>You have already joined this tournament!</p>');
-                        } else {
-                            showInfoModal('Error!', '<p>Something went wrong, please try again later.</p>');
-                        }
-                        setBtnLoading(btn, false);
-                    }
-                })
-            },
-            error: function (response) {
-                showInfoModal('Error!', '<p>Something went wrong, please try again later.</p>')
-                setBtnLoading(btn, false);
-                console.log(response);
+   
+        $("#set-game-account").submit(function (e) {
+        
+            e.preventDefault();
+            var btn = $(this).find("button[type=submit]");
+            setBtnLoading(btn, true);
+            $('#set-game-account').find('.error_msg').html('');
+            var account = $('#set-game-account').find("input[name='account']").val();
+            if(account=="" ||  account.trim()==""){
+                btn.removeClass('is-loading');
+                btn.removeAttr('disabled');
+                $('#set-game-account').find('.error_msg').html('Nickname is not valid!')
+                return;
             }
-        })
+            if(account.length<=1){
+                btn.removeClass('is-loading');
+                btn.removeAttr('disabled');
+                $('#set-game-account').find('.error_msg').html('Nickname length must be greater than 1!')
+                return;
+            }
+            var serializedData = $(this).serialize();
+            $.ajax({
+                type: 'POST',
+                url: set_game_account,
+                headers: {
+                    "X-CSRFToken": xtoken,
+                },
+                data: serializedData,
+                success: function (response) {
+                    $.ajax({
+                        type: 'POST',
+                        url: tournament_join.replace("$1", tournament_slug),
+                        headers: {
+                            "X-CSRFToken": xtoken,
+                        },
+                        success: function (response) {
+                            $("#user-game-modal").modal("hide");
+                        
+                            if (response.code === 'waiting_list') {
+                                $('#joinStatus').html('<a style="cursor: default" class="disabled">Waiting List</a>');
+                                showInfoModal('Waiting List', '<p>You were added in the waiting list since the tournament is already full. You will be added automatically in case active users left the tournament.</p>')
+                            } else {
+                                update_joinedtrn();
+                                $('#joinStatus').html('<a style="cursor: default">Joined <img src="/static/img/check.svg" class="joined-in" alt=""></a>');
+                                showInfoModal("You're in!", "<p>You have joined the tournament successfully.</p>")
+                            }
+                            //setBtnLoading(btn, false);
+                            $('#info-modal .btn3').click(function(){ location.reload();})
+                        
+                        },
+                        error: function (response) {
+                            $("#user-game-modal").modal("hide");
+                            if(response.responseJSON.code === 'unbilled_user'){
+                                showInfoModal('Recharge Line!', '<p>You don\'t have enough balance to join this tournament. Please recharge your line and try again.</p>');
+                            } else if(response.responseJSON.code === 'free_user'){
+                                showInfoModal('Error!', '<p>This tournament does not accept free users. Please <a href="/register">subscribe to Engage</a> in order to join.</p>');
+                                //$('#upgrade-package-modal').modal('show');
+                            } else if(response.responseJSON.code === 'minimum_profile_level'){
+                                showInfoModal('Error!', '<p>You do not meet the minimum level requirement! Please try joining at a later time.</p>');
+                            } else if(response.responseJSON.code === 'participant_exists'){
+                                showInfoModal('Error!', '<p>You have already joined this tournament!</p>');
+                            } else {
+                                showInfoModal('Error!', '<p>Something went wrong, please try again later.</p>');
+                            }
+                            setBtnLoading(btn, false);
+                        }
+                    })
+                },
+                error: function (response) {
+                    showInfoModal('Error!', '<p>Something went wrong, please try again later.</p>')
+                    setBtnLoading(btn, false);
+                    console.log(response);
+                }
+            })
+        
     })
-
+    
 
 })
 
@@ -373,38 +376,196 @@ function update_joinedtrn() {
     });
 }
 
+
+
+function check_new_billed_user(uid) {
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: check_billed_user.replace("user_uid", user_uid),
+            headers: {
+                "X-CSRFToken": xtoken,
+            },
+            type: "post",
+            data: {
+                msisdn: user_uid,
+            },
+            error: function (value) {
+                reject(value);
+            },
+            success: function (value) {
+                // Resolve the Promise with the received value
+                resolve(value);
+            },
+        });
+    });
+}
+
+function check_user_new_status() {
+    $("#user-game-modal").modal("hide");
+    return new Promise((resolve, reject) => {
+        $.ajax({
+            url: check_user_status.replace("user_uid", user_uid),
+            headers: {
+                "X-CSRFToken": xtoken,
+            },
+            type: "post",
+            data: {},
+            error: function (value) {
+                reject(value);
+            },
+            success: function (value) {
+                resolve(value);
+                console.log("value", value, value.status);
+                // Check if not the same status
+                if (value.status != $('#userSub').val()) {
+                    window.location.reload();
+                } else {
+                    check_billed_status();
+                }
+            },
+        });
+    });
+}
+
 $('.register_btn').on("click", function () {
-    function check_user_new_status() {
-        $("#user-game-modal").modal("hide");
-        return new Promise((resolve, reject) => {
+    check_user_new_status();
+});
+
+function check_billed_status() {
+    check_new_billed_user(user_uid).then(res => {
+        if (res['is_billed'] == false) {
+            $("#user-game-modal").modal("show");
+        } else {
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: update_billed_status.replace("user_uid", user_uid),
+                    headers: {
+                        "X-CSRFToken": xtoken,
+                    },
+                    type: "post",
+                    data: {},
+                    error: function (value) {
+                        reject(value);
+                    },
+                    success: function (value) {
+                        resolve(value);
+                    },
+                });
+            });
+        }
+    }).catch(e => {
+    }).then(() => {
+        // Now you can call check_user_new_status() in the else section
+        if (game_slug.includes('html5')) 
+        {
             $.ajax({
-                url: check_user_status.replace("user_uid", user_uid),
+                type: 'POST',
+                url: tournament_join.replace("$1", tournament_slug),
                 headers: {
                     "X-CSRFToken": xtoken,
                 },
-                type: "post",
-                data: {},
-                error: function (value) {
-                    reject(value);
+                success: function (response) {
+                    $("#user-game-new-modal").modal("hide");
+                   
+                    if (response.code === 'waiting_list') {
+                        $('#joinStatus').html('<a style="cursor: default" class="disabled">Waiting List</a>');
+                        showInfoModal('Waiting List', '<p>You were added in the waiting list since the tournament is already full. You will be added automatically in case active users left the tournament.</p>')
+                    } else {
+                        $('#joinStatus').html('<a style="cursor: default">Joined <img src="/static/img/check.svg" class="joined-in" alt=""></a>');
+                        showInfoModal("You're in!", "<p>You have joined the tournament successfully.</p>")
+                        update_joinedtrn();
+                    }
+                    setBtnLoading(btn, false);
                 },
-                success: function (value) {
-                    resolve(value);
-                    console.log("value",value,value.status);
-                    //check if not same status
-                    if(value.status != $('#userSub').val())
-                    {
-                        window.location.reload();
-                    }
-                    else {
-                        $("#user-game-modal").modal("show"); 
-                    }
+                error: function (response) {
+                    $("#user-game-new-modal").modal("hide");
                     
-                },
-            });
-        });
-    }
-    check_user_new_status();
-})
+                    if(response.responseJSON.code === 'unbilled_user'){
+                        showInfoModal('Error!', '<p>Your subscription has expired! Please renew it to join.</p>');
+                    } else if(response.responseJSON.code === 'free_user'){
+                        showInfoModal('Error!', '<p>This tournament does not accept free users. Please <a href="/register">subscribe to Engage</a> in order to join.</p>');
+                    } else if(response.responseJSON.code === 'minimum_profile_level'){
+                        showInfoModal('Error!', '<p>You do not meet the minimum level requirement! Please try joining at a later time.</p>');
+                    } else if(response.responseJSON.code === 'participant_exists'){
+                        showInfoModal('Error!', '<p>You have already joined this tournament!</p>');
+                    } else {
+                        showInfoModal('Error!', '<p>Something went wrong, please try again later.</p>');
+                    }
+                    setBtnLoading(btn, false);
+                }
+            })
+            
+        }
+        else{
+            $("#user-game-modal").modal("show");
+        }
+    });
+}
+
+
+// function check_billed_status(){
+//     check_new_billed_user(user_uid).then(res => {
+//         if (res['is_billed'] == false)
+//         {
+//             $("#user-game-modal").modal("show");
+//         }
+//         else 
+//         {
+//             return new Promise((resolve, reject) => {
+//                 $.ajax({
+//                   url: update_billed_status.replace("user_uid", user_uid),
+//                   headers: {
+//                     "X-CSRFToken": xtoken,
+//                   },
+//                   type: "post",
+//                   data: {},
+//                   error: function (value) {
+//                       reject(value);
+//                   },
+//                   success: function (value) {
+//                       resolve(value);
+//                     },
+//                 });
+//               });
+//         }
+        
+//     }).catch(e => {
+//     }).then(() => {
+//         // Call check_user_new_status() in the else section
+//         check_user_new_status();
+//     });
+// }
+
+// $('.register_btn').on("click", function () {
+//     function check_user_new_status() {
+//         $("#user-game-modal").modal("hide");
+//         return new Promise((resolve, reject) => {
+//             $.ajax({
+//                 url: check_user_status.replace("user_uid", user_uid),
+//                 headers: {
+//                     "X-CSRFToken": xtoken,
+//                 },
+//                 type: "post",
+//                 data: {},
+//                 error: function (value) {
+//                     reject(value);
+//                 },
+//                 success: function (value) {
+//                     resolve(value);
+//                     console.log("value", value, value.status);
+//                     // Check if not the same status
+//                     if (value.status != $('#userSub').val()) {
+//                         window.location.reload();
+//                     } else {
+//                         check_billed_status();
+//                     }
+//                 },
+//             });
+//         });
+//     }
+//     check_user_new_status();
+// });
+
 
 $('.btn_upgrade').on("click", function () {
     setBtnLoading($(this), true);
@@ -422,12 +583,12 @@ $('.btn_upgrade').on("click", function () {
                     reject(value);
                 },
                 success: function (value) {
-                    value.is_sub
-                        resolve(value);
-                        if (value.is_sub == 'false')
-                        {
-                            window.location.href="/secured"
-                        }
+                    //value.is_sub
+                    resolve(value);
+                        // if (value.is_sub == 'false')
+                        // {
+                        //     window.location.href="/secured"
+                        // }
                 },
             });
         });

@@ -8,7 +8,7 @@ class CustomPasswordValidator():
 
     def __init__(self, min_length=1):
         self.min_length = min_length
-        self.consec = ['012', '123', '234', '345', '456', '567', '678', '789', '890', '210', '321', '432', '543', '654', '765', '876', '987', '098']
+        self.consec = ['012', '123', '233', '345', '456', '567', '678', '789', '890', '210', '321', '432', '543', '654', '765', '876', '987', '098']
         self.f = open(finders.find('admin/passvalidation/all_pass.txt'), encoding='latin-1')
         self.newpass = self.f.read().splitlines()
         self.f.close()

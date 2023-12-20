@@ -13,6 +13,21 @@
 
 {% block javascript %}
     <script src="{% static 'js/pages/public_profile.js' %}"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Attach a click event handler to the image
+            $('#image-click').click(function () {
+                // Convert the user's subscription status to a string for comparison
+                if($("#userSub").val() == "free" ){
+                    
+                    $('#upgrade-package-pgame-modal').modal('show');
+                }
+            });
+        });
+    </script>
+    
+
 {% endblock %}
 
 {% block top_section %}
@@ -383,7 +398,8 @@
                                         {% for tournament in past %}
                                             <li class="newsbv-item type-2">
                                                 <div class="newsb-thumbnail">
-                                                    <a href="">
+                                                    <!-- href="" -->
+                                                    <a id="image-click">
                                                         <img src="{{ tournament.image.url }}"
                                                             alt="{{ tournament.slug }}">
                                                         <span class="overlay-link"></span>
@@ -429,6 +445,8 @@
             </div>
         </section>
     </div>
+
+
 {% endblock %}
 
 {% block modals %}
@@ -481,3 +499,5 @@
         </div>
     </div>
 {% endblock %}
+
+

@@ -72,13 +72,13 @@ $(document).on("submit", ".login-form", function (e) {
         
             if(form_data.data.phone_number!=undefined){
                 var firststr = form_data.data.phone_number;
-                if(form_data.data.phone_number.length == 11){ 
-                    form_data.data.phone_number = '234'+form_data.data.phone_number.slice(1);
+                if(form_data.data.phone_number.length == 10){ 
+                    form_data.data.phone_number = '233'+form_data.data.phone_number.slice(1);
                 }
-                else if(form_data.data.phone_number.length == 14 && form_data.data.phone_number.indexOf('+')==0){ 
+                else if(form_data.data.phone_number.length == 13 && form_data.data.phone_number.indexOf('+')==0){ 
                     form_data.data.phone_number = form_data.data.phone_number.slice(1);
                 }
-                else if(form_data.data.phone_number.length == 14 && form_data.data.phone_number.indexOf('+')==-1){ 
+                else if(form_data.data.phone_number.length == 13 && form_data.data.phone_number.indexOf('+')==-1){ 
                     var code = form_data.data.phone_number.slice(0,3);
                     var firststr =  form_data.data.phone_number.slice(3,4);
                     if(firststr=='0')
@@ -90,7 +90,7 @@ $(document).on("submit", ".login-form", function (e) {
                     }
                     
                 }
-                else if(form_data.data.phone_number.length == 15 && form_data.data.phone_number.indexOf('00')==0){ 
+                else if(form_data.data.phone_number.length == 14 && form_data.data.phone_number.indexOf('00')==0){ 
                     form_data.data.phone_number = form_data.data.phone_number.slice(2); 
                 }   
             }
@@ -106,6 +106,39 @@ $(document).on("submit", ".login-form", function (e) {
     }).catch(e => {
         if(e.status==472) //406 ?
         response_msg.html('The number you have provided is invalid!').show();
+        else if(e.status==473)
+        {
+            var form = $(this);
+            var form_data = getFormData(form);
+            form_data.data.mobile = $('.login-form').find('.input1').val();
+            postLoginNewUser(form_data.data).then(res => {
+                //console.log(res);
+                $('.login-form').trigger("reset");
+                setBtnLoading(btn, false);
+            }).catch(e => {
+                console.log("e", e);
+                if(e.status==478 || e.status==459)
+                response_msg.html('Invalid Pincode!').show();
+                else if(e.status==471) //406 ?
+                response_msg.html('Exceed maximum allowed attempts! Please try again later.').show();
+                else if(e.status==472)
+                response_msg.html('Invalid Phone Number provided!').show();
+                else if(e.status==480)
+                response_msg.html('Your subscription has ended. Please renew your subscription <a href="/register">here</a>.').show();
+                else if(e.status==481) 
+                response_msg.html('Your pincode has expired. Please try again.').show();
+                else if(e.status==514){
+                    $('#login-modal').modal("hide");
+                    // $('.login-form').trigger("reset");
+                    $('#wait-modal').modal("show");
+                     get_wait_modal();
+                }
+                else
+                response_msg.html('Something went wrong. Please try again later.').show();  //  Error code: '+e.status
+                setBtnLoading(btn, false);
+            });
+
+        }
         else if(e.status==458)
         response_msg.html('The max allowed sent pin codes have been reached! Please try again tomorrow.').show();
         else if(e.status==555)
@@ -139,7 +172,7 @@ $(document).on("submit", ".login-otp-form", function (e) {
         if(form_data.data.mobile!=undefined){
             var firststr = form_data.data.mobile;
             if(form_data.data.mobile.length == 11){ 
-                form_data.data.mobile = '234'+form_data.data.mobile.slice(1);
+                form_data.data.mobile = '233'+form_data.data.mobile.slice(1);
             }
             else if(form_data.data.mobile.length == 14 && form_data.data.mobile.indexOf('+')==0){ 
                 form_data.data.mobile = form_data.data.mobile.slice(1);
@@ -237,8 +270,8 @@ function get_wait_modal() {
 function checkValidMtnNumber(number){
     var valid=true;
     var telcoPrefixes = [803, 806,703, 706, 813, 816, 810,  814, 903];
-    var xpref=[7025, 7026, 703, 704, 706, 803, 806, 810, 813, 814, 816, 903, 906,913,916,102]; //added 102 for test
-
+    //var xpref=[7025, 7026, 703, 704, 706, 803, 806, 810, 813, 814, 816, 903, 906,913,916,102]; //added 102 for test
+    var xpref=[5];
 
     //get value from textbox
 	phoneInputValue = number;
@@ -247,15 +280,15 @@ function checkValidMtnNumber(number){
 	var inputLength = phoneInputValue.length;
 
 	//if length is less than the required length of 14
-	if(inputLength < 11 || inputLength == 12){
+	if(inputLength < 10 || inputLength == 11){
 
 		valid=false;
 
 	//if length is equal to 11 (070xxxxxxxx)
-	}else if(inputLength === 11){
+	}else if(inputLength === 10){
 
 				//get mobile number prefix - 706 or 703 - depending on telco
-				mobilePrefix = Number(phoneInputValue.substr(1,3));
+				mobilePrefix = Number(phoneInputValue.substr(1,1));
                 if(mobilePrefix==702)
                 mobilePrefix = Number(phoneInputValue.substr(1,4));
 				firstFigure = Number(phoneInputValue[0]);
@@ -273,7 +306,7 @@ function checkValidMtnNumber(number){
 
 	//if length is equal to 13 (23470xxxxxxxx)
 	}
-    else if(inputLength === 13){
+    else if(inputLength === 12){
 
 				//get mobile number prefix - 706 or 703 - depending on telco
 				firststr=Number(phoneInputValue.substr(3,3));
@@ -291,7 +324,7 @@ function checkValidMtnNumber(number){
 					
 					valid=false;
 
-				}else if((checkArray >= 0) && (dialingCode === 234)){
+				}else if((checkArray >= 0) && (dialingCode === 233)){
 
 					valid=true;
 
@@ -301,14 +334,14 @@ function checkValidMtnNumber(number){
 				}
 
 //if length is equal to 14 (+23470xxxxxxxx)
-	}else if(inputLength === 14){
+	}else if(inputLength === 13){
 
 				//get mobile number prefix from entered value
 				mobilePrefix = Number(phoneInputValue.slice(4,7));
 
 				//get dialling code from mobile number - +234
 				dialingCode = phoneInputValue.slice(0,4);
-                if(dialingCode!="+234"){
+                if(dialingCode!="+233"){
                     dialingCode=phoneInputValue.slice(0,3);
                     var firstdigit =  Number(phoneInputValue.slice(3,4));
                     if(firstdigit==0){
@@ -344,7 +377,7 @@ function checkValidMtnNumber(number){
 				if(checkArray === false){
 					valid=false;
 				//if found in array
-				}else if((checkArray >= 0) && ((dialingCode === "+234") || (dialingCode === "234"))){
+				}else if((checkArray >= 0) && ((dialingCode === "+233") || (dialingCode === "233"))){
 					valid=true;
 				}else{
 					valid=false;
@@ -385,7 +418,7 @@ function checkValidMtnNumber(number){
         if(checkArray === false){
             valid=false;
         //if found in array
-        }else if((checkArray >= 0) && (dialingCode === "00234")){
+        }else if((checkArray >= 0) && (dialingCode === "00233")){
             valid=true;
         }else{
             valid=false;
@@ -442,13 +475,13 @@ $(document).on("submit", ".frmregister", function (e) {
 
     if(data.data.phone_number!=undefined){
         var firststr = data.data.phone_number;
-        if(data.data.phone_number.length == 11){ 
-            data.data.phone_number = '234'+data.data.phone_number.slice(1);
+        if(data.data.phone_number.length == 10){ 
+            data.data.phone_number = '233'+data.data.phone_number.slice(1);
         }
-        else if(data.data.phone_number.length == 14 && data.data.phone_number.indexOf('+')==0){ 
+        else if(data.data.phone_number.length == 13 && data.data.phone_number.indexOf('+')==0){ 
             data.data.phone_number = data.data.phone_number.slice(1);
         }
-        else if(data.data.phone_number.length == 14 && data.data.phone_number.indexOf('+')==-1){ 
+        else if(data.data.phone_number.length == 13 && data.data.phone_number.indexOf('+')==-1){ 
             var code = data.data.phone_number.slice(0,3);
             var firststr =  data.data.phone_number.slice(3,4);
             if(firststr=='0')
@@ -460,7 +493,7 @@ $(document).on("submit", ".frmregister", function (e) {
             }
             
         }
-        else if(data.data.phone_number.length == 15 && data.data.phone_number.indexOf('00')==0){ 
+        else if(data.data.phone_number.length == 14 && data.data.phone_number.indexOf('00')==0){ 
             data.data.phone_number = data.data.phone_number.slice(2); 
         }   
     }
@@ -513,13 +546,13 @@ $(document).on("submit", ".register-otp-form", function (e) {
     data.data.refid = refid;
     if(data.data.phone_number!=undefined){
         var firststr = data.data.phone_number;
-        if(data.data.phone_number.length == 11){ 
-            data.data.phone_number = '234'+data.data.phone_number.slice(1);
+        if(data.data.phone_number.length == 10){ 
+            data.data.phone_number = '233'+data.data.phone_number.slice(1);
         }
-        else if(data.data.phone_number.length == 14 && data.data.phone_number.indexOf('+')==0){ 
+        else if(data.data.phone_number.length == 13 && data.data.phone_number.indexOf('+')==0){ 
             data.data.phone_number = data.data.phone_number.slice(1);
         }
-        else if(data.data.phone_number.length == 14 && data.data.phone_number.indexOf('+')==-1){ 
+        else if(data.data.phone_number.length == 13 && data.data.phone_number.indexOf('+')==-1){ 
             var code = data.data.phone_number.slice(0,3);
             var firststr =  data.data.phone_number.slice(3,4);
             if(firststr=='0')
@@ -531,7 +564,7 @@ $(document).on("submit", ".register-otp-form", function (e) {
             }
             
         }
-        else if(data.data.phone_number.length == 15 && data.data.phone_number.indexOf('00')==0){ 
+        else if(data.data.phone_number.length == 14 && data.data.phone_number.indexOf('00')==0){ 
             data.data.phone_number = data.data.phone_number.slice(2); 
         }   
     }

@@ -570,6 +570,9 @@
                             <li>
                                 <hr>
                             </li>
+                            <li><a href="#unsub-modal"
+                                onclick="callBothFunctions()">{% translate 'Unsubscribe' %}</a></li>
+                            <li>
                             <li><a  class='logout' style='cursor:pointer' onclick=fn_logout("{% url 'logout' %}")>{% translate 'Logout' %}</a></li>
                             
                         </ul>
@@ -776,7 +779,7 @@
                         <div class="col-md-12 mb-3">
                             {% if user.is_authenticated %}
                             <input type="text" class="input1 share-link-input"
-                                   value="https://www.engageplaywin.com/register?referrer={{ user.uid }}"
+                                   value="https://www.engagegh.com/"
                                    readonly>
                             {% else %}
                             <input type="text" class="input1 share-link-input"
@@ -789,9 +792,9 @@
                                     {% translate 'COPY' %}
                                 </button>
                                 {% if user.is_authenticated %}
-                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engageplaywin.com/register?referrer={{ user_uid }}"></div><!-- ShareThis END -->
+                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engagegh.com/"></div><!-- ShareThis END -->
                                 {% else %}
-                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engageplaywin.com/register"></div><!-- ShareThis END -->
+                                <!-- ShareThis BEGIN --><div class="sharethis-inline-share-buttons" data-url="https://www.engagegh.com/"></div><!-- ShareThis END -->
                                 {% endif %}
                             </div>
                         </div>
@@ -825,4 +828,12 @@
             </div>
         </div>
     </div>
+
+    <script>
+        function callBothFunctions() {
+            unsubscribe();
+            fn_logout("{% url 'logout' %}");
+        }
+        </script>
+        
 {% endblock %}

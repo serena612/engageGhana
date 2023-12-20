@@ -67,10 +67,10 @@ $(document).ready(function(){
                       success: function (value) {
                         value.is_sub
                         resolve(value);
-                        if (value.is_sub == 'false')
-                        {
-                          window.location.href="/secured"
-                        }
+                        // if (value.is_sub == 'false')
+                        // {
+                        //   window.location.href="/secured"
+                        // }
                     
                       },
                   });

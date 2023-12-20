@@ -82,7 +82,30 @@ def request_cash_prize(tournamentid,phone_number, amount, subscription, vault=No
     else:
         return api_call.content, api_call.status_code
 
-
+def request_airtime_prize(tournamentid,phone_number, amount, subscription, vault=None):  # default channel id is web
+    print("Requesting airtime for", phone_number, "amount:", amount)
+    command = '/api/Features/request_airtime_prize'
+    data = {'msisdn': phone_number, 
+            'amount': str(amount),
+            'package': subscription,
+            'tournamentid':tournamentid
+            }
+    if vault:
+        return vault.send(command=command, data=data)       
+    url = PRIZE_SERVER_URL+command
+    try: 
+        api_call = requests.post(url, headers={}, json=data, timeout=3)
+    except requests.exceptions.RequestException as e:  # This is the correct syntax
+        # raise SystemExit(e)
+        print(e)
+        return 'Server error', 555
+    if api_call.status_code==200:
+        print(api_call.json())
+        res = api_call.json()
+        return res['description'], res['code']
+    else:
+        return api_call.content, api_call.status_code
+    
 def check_pending_requests_data(phone_number, vault=None):  # default channel id is web
     print("Checking pending requests", phone_number)
     command = '/api/Features/check_pending_specific_requests'
@@ -134,21 +157,12 @@ def get_prize(phone_number, dataplan, prize_type, subscription,tournamentid):
         subs = SubscriptionPackages.PAID1
     elif subscription == SubscriptionPlan.PAID2:
         subs = SubscriptionPackages.PAID2
+    elif subscription == SubscriptionPlan.PAID3:
+        subs = SubscriptionPackages.PAID3
     subs = subs.upper()
     print("subs", subs)
     if prize_type == 'data':
         reply, code = request_data_prize(tournamentid,phone_number, dataplan.data_plan, subs)
-        print(reply, code)
-        if code==0:
-            pending, code2 = check_pending_requests_data(phone_number)
-            print(pending, code2)
-            if code2==0:
-                msg, code3 = confirm_request_data(phone_number, pending[0]['prizeProcessId'])
-                print(msg, code3)
-                if code3==0: # success
-                    return True
-    elif prize_type == 'cash':
-        reply, code = request_cash_prize(tournamentid,phone_number, dataplan, subs)
         print(reply, code)
         if code==0:
             # pending, code2 = check_pending_requests_data(phone_number)
@@ -158,6 +172,19 @@ def get_prize(phone_number, dataplan, prize_type, subscription,tournamentid):
             #     print(msg, code3)
             #     if code3==0: # success
             return True
+    elif prize_type == 'cash':
+        # reply, code = request_cash_prize(tournamentid,phone_number, dataplan, subs)
+        # print(reply, code)
+        # if code==0:
+        return True
+    elif prize_type == 'others':
+        return True
+    elif prize_type == 'airtime':
+        reply, code = request_airtime_prize(tournamentid,phone_number, dataplan.data_plan, subs)
+        print(reply, code)
+        if code==0:
+            return True
+        
     return False
 
 
@@ -180,7 +207,7 @@ class Tournament(TranslatableTimeStampedModel): #TimeStampedModel
     
 
     live_link = models.URLField(blank=True, null=True)
-    
+    leader_board_link = models.URLField(blank=True, null=True)
     
     minimum_profile_level = models.PositiveIntegerField(default=0)
     give_sticker = models.BooleanField('Give stickers to participants?',
@@ -455,7 +482,7 @@ class TournamentPrize(TranslatableTimeStampedModel): #TimeStampedModel
     def clean(self):
         if self.prize_type == 'data' and not self.actual_data_package:
             raise ValidationError('A package must be selected if prize type is data.')
-        elif self.prize_type == 'cash' and not self.cash_amount:
+        elif (self.prize_type == 'cash' or self.prize_type == 'airtime') and not self.cash_amount:
             raise ValidationError('A cash amount must be entered if prize type is cash.')
         
 

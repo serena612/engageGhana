@@ -17,17 +17,13 @@ from engage.account.models import UserTransactionHistory
 from datetime import datetime
 from datetime import timedelta
 from django.contrib.auth import get_user_model, login
-from engage.settings.base import LANGUAGE_CODE
-from django.utils.translation import get_language
-import uuid
 import csv
 
-from engage.account.api import do_register
-from engage.tournament.api import test_page
-from django.core import signing
 import logging
-import base64
 
+
+import base64
+from engage.account.api import do_register
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
@@ -37,33 +33,38 @@ from os import urandom
 
 logger = logging.getLogger('custom_logger')
 
-
 UserModel = get_user_model()
 
-@notify_when(events=[
-    NotificationTemplate.HOME,
-    NotificationTemplate.HOW_TO_USE
-])
+#@notify_when(events=[
+#    NotificationTemplate.HOME,
+#    NotificationTemplate.HOW_TO_USE
+#])
 
 def attempt_login_register(request):
+    print("-----------------------------------attempt_login_register")
+    print("-----------------------------------request.session", request.session)
+    print("-----------------------------------request.user.is_authenticated", request.user.is_authenticated)
     if 'msisdn' not in request.session or request.user.is_authenticated:
-      print("inside first if")
-      return
+       print("inside first if")
+       return
     try:
         mobilen = request.session['msisdn']
+        print("----------------------------------mobilen ",mobilen)
         request.user = mobilen
+        print("yos-request.user",request.user)
         user = UserModel.objects.filter(
             mobile__iexact=mobilen,
             region=request.region
         ).first()
         if user:
-            # user found attempt direct login
+            #user found attempt direct login
             usermob = str(user.mobile)
+            print("------------------------------login")
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
-            
         else:
             # user not found attempt registration
             usermob = mobilen
+            print("-------------------------------usermob",usermob)
             do_register(None, request, usermob, SubscriptionPlan.FREE)
     
     except UserModel.DoesNotExist:
@@ -88,38 +89,39 @@ def encrypt_msisdn(key, msisdn):
 
     iv_and_ciphertext = iv + ciphertext
     base64_encrypted_msisdn = b64encode(iv_and_ciphertext).decode('utf-8')
-    return base64_encrypted_msisdn
-
+    base64_encrypted_msisdn_new = base64_encrypted_msisdn.replace("/", "dsslsshd").replace("+", "dsplussd")
+    print('$$$$$$$$$ base64_encrypted_msisdn_new', base64_encrypted_msisdn_new)
+    return base64_encrypted_msisdn_new
+    
 def empty_view(request):
     print("empty_viewwww")
-    if 'msisdn' in request.session:
-        print("request.headers.get('Msisdn')",request.session['msisdn'])
-        with open('msisdn.csv', 'a') as file:
-            writer = csv.writer(file)
-            writer.writerow([request.session['msisdn']])
-            #file.write(request.session['msisdn'])
-        if not request.user.is_authenticated:
-            m = request.session['msisdn']
-            key = 'Zjg0ZGJhYmI1MzJjNTEwMTNhZjIwYWE2N2QwZmQ1MzU='
-            encrypted_data = encrypt_msisdn(key,m)
-            redirect_url = 'https://mtn.engageplaywin.com/Landing'
-            return redirect(f'{redirect_url}?m={encrypted_data}')
-            #return redirect('https://mtn.engageplaywin.com/Landing')
-        else:
-            return redirect('/home')
-    elif request.user.is_authenticated:
-        return redirect('/home')
-    else:
-        return redirect('https://mtn.engageplaywin.com/Landing')
-
-
-
+    return redirect('/home')
+    # if 'msisdn' in request.session:
+    #     print("request.headers.get('Msisdn')",request.session['msisdn'])
+    #     with open('msisdn.csv', 'a') as file:
+    #         writer = csv.writer(file)
+    #         writer.writerow([request.session['msisdn']])
+    #         #file.write(request.session['msisdn'])
+    #     if not request.user.is_authenticated:
+    #         m = request.session['msisdn']
+    #         key = 'Zjg0ZGJhYmI1MzJjNTEwMTNhZjIwYWE2N2QwZmQ1MzU='
+    #         encrypted_data = encrypt_msisdn(key,m)
+    #         redirect_url = 'https://mtn.engageplaywin.com/Landing'
+    #         return redirect(f'{redirect_url}?m={encrypted_data}')
+    #         #return redirect('https://mtn.engageplaywin.com/Landing')
+    #     else:
+    #         return redirect('/home')
+    # elif request.user.is_authenticated:
+    #     return redirect('/home')
+    # else:
+    #     return redirect('https://mtn.engageplaywin.com/Landing')
+    
 def home_view(request):
-    logger.info('This is home view')
-    print("msisdn", request.user)
+    #logger.info('This is home view')
+    print("---------------------------------------home_view")
     #request.COOKIES['logged_out'] = datetime.now().isoformat()
     #print("COOKIE",request.COOKIES['logged_out'])
-
+    print("----------------------------------------CHC-request ",request.headers)
     #print("CHC-request user id ",request.session['user_id'])
     if 'msisdn' in request.session:
         user = request.session['msisdn']
@@ -128,25 +130,26 @@ def home_view(request):
         user = request.user
         #print("wifi user ",user)
     #print("CHC-home msisdn", user)
-
-    if request.user: #or request.user.is_authenticated:  #request.user
+    
+    if user: #or request.user.is_authenticated:
         print("inside first if")
         #print(logged_out)
-        print('logged_out' in request.COOKIES)
-        if 'logged_out' in request.COOKIES:  # check if log out date is present
-          print("inside second if")
-          if datetime.now() - datetime.fromisoformat(request.COOKIES['logged_out']) < timedelta(minutes=5): # check if expired
-              # show logged out page
-              print("pass")
-              pass
-          else:
-              # attempt login/register
-              print("attempt login")
-              attempt_login_register(request)
-        else:
-            # attempt login/register
-            print("else")
-            attempt_login_register(request)
+        #print('logged_out' in request.COOKIES)
+        #if 'logged_out' in request.COOKIES:  # check if log out date is present
+        #  print("inside second if")
+        #  if datetime.now() - datetime.fromisoformat(request.COOKIES['logged_out']) < timedelta(minutes=5): # check if expired
+        #     # show logged out page
+#              print("passssss")
+#              pass
+#          else:
+#              # attempt login/register
+#              print("attempt loginnnnn")
+#              attempt_login_register(request)
+#        else:
+#            # attempt login/register
+#            print("else")
+        
+        attempt_login_register(request)
     else:
       print("CHC-request.user not found")
             
@@ -154,18 +157,14 @@ def home_view(request):
 
     featured_games = FeaturedGame.objects.all()
     games = Game.objects.all()
-
     ad = OperatorAd.objects.filter(
-            (Q(start_date__gte=now) & Q(end_date__lte=now)) |
-            (Q(start_date__isnull=True) & Q(end_date__isnull=True)),
-            regions__in=[request.region]
-        ).order_by('?').first()
-
+        (Q(start_date__gte=now) & Q(end_date__lte=now)) |
+        (Q(start_date__isnull=True) & Q(end_date__isnull=True)),
+        regions__in=[request.region]
+    ).order_by('?').first()
     events = Event.objects.filter(
-            regions__in=[request.region]
-        ).all().order_by('?')[:20]
-
-
+        regions__in=[request.region]
+    ).all().order_by('?')[:20]
 
      # previous_tournaments = Tournament.objects.select_related('game').prefetch_related(
     #     'tournamentparticipant_set',
@@ -181,15 +180,15 @@ def home_view(request):
         user_id = True
     else:
         user_id = False
-    if request.user and request.user.is_authenticated :
+    if request.user and request.user.is_authenticated:
         user_uid = request.user.uid
     else:
         user_uid = ""
 
     if request.user.is_authenticated :
         transaction = UserTransactionHistory.objects.filter(user=request.user).first()
-        print("transaction", transaction, "viewed", transaction.engage_viewed())
-        
+        #print("transaction", transaction, "viewed", transaction.engage_viewed())
+    
         if transaction and transaction.engage_viewed() < 3:
             is_ad_engage = 0
         else:
@@ -198,13 +197,19 @@ def home_view(request):
             is_ad_google = 0
         else:
             is_ad_google = 1
-    
+
+        key = 'Zjg0ZGJhYmI1MzJjNTEwMTNhZjIwYWE2N2QwZmQ1MzU='
+        msisdn = getattr(request.user, 'mobile', None)  # Replace 'msisdn_attribute_name' with the actual attribute name
+        if msisdn:
+            encrypted_data = encrypt_msisdn(key, msisdn)
+        else:
+            # Handle the case where MSISDN is not available for the authenticated user
+            print("MSISDN not available for the authenticated user")
+
     else:
         is_ad_engage = 1
         is_ad_google = 1
-
-    lang_code = get_language()
-    print("lang_code", lang_code)
+        encrypted_data = ''
 
     return render(request, 'index.html', {'featured_games': featured_games,
                                           'games': games,
@@ -216,7 +221,7 @@ def home_view(request):
                                           'user_uid': user_uid,
                                           'is_ad_google': is_ad_google,
                                           'is_ad_engage':is_ad_engage,
-                                          'lang_code': lang_code})
+                                          'encrypted_data':encrypted_data})
 
 def hometest_view(request):
 
@@ -272,13 +277,12 @@ def hometest_view(request):
 
     return render(request, 'home_test.html', { 'featured_games' : featured_games,
                                             'ad': ad,
-                                            'user_id': user_id,
+                                          'user_id': user_id,
                                           'show_ads': SHOWADS,
                                           'user_uid': user_uid,
                                           'is_ad_google': is_ad_google,
                                           'is_ad_engage':is_ad_engage})
-
-
+  
 def nowinners_view(request):
 
     if request.user: #or request.user.is_authenticated:  #request.user
@@ -336,8 +340,6 @@ def nowinners_view(request):
         is_ad_engage = 1
         is_ad_google = 1
 
-    lang_code = get_language()
-    print("lang_code", lang_code)
 
     return render(request, 'nowinners.html', {'featured_games': featured_games,
                                           'games': games,
@@ -347,19 +349,17 @@ def nowinners_view(request):
                                           'show_ads': SHOWADS,
                                           'user_uid': user_uid,
                                           'is_ad_google': is_ad_google,
-                                          'is_ad_engage':is_ad_engage,
-                                          'lang_code': lang_code})
+                                          'is_ad_engage':is_ad_engage})                                        
 
 def secured_view(request):
-   logging.debug ("Accessing secured page")
+   logging.info("Accessing secured page")
    return render(request, 'secured.html', {})
-
-    
+   
 def about_view(request):
     if  request.user.is_staff or request.user.is_superuser :
         return redirect('/auth/logout/')  
     return render(request, 'about.html', {})
-
+    
 def landing_view(request):
     if  request.user.is_staff or request.user.is_superuser :
         return redirect('/auth/logout/')  
@@ -367,28 +367,27 @@ def landing_view(request):
 
 
 def register_view(request):
+    print("--------------------------------------------------------------register view")
     if request.user and request.user.is_authenticated or ('user_id' in request.session and 'renewing' not in request.session):
        return redirect('/')
     elif 'headeren' not in request.session and request.is_secure() and 'msisdn' not in request.session:
-        print("uri",request.build_absolute_uri())
-        gaga = request.build_absolute_uri().replace('https', 'http')
-        print("gaga", gaga)
-        # return redirect(gaga)
+        #print("request.build_absolute_uri()", request.build_absolute_uri())
+        gaga =  request.build_absolute_uri().replace('https', 'http')
+        #print("gaga", gaga)
         return redirect(gaga)
     else :
-        # print(request.headers)
+       # print(request.headers)
+        print("header enr")
         refid = request.GET.get('referrer')
         if refid != "":
-            print("uid", User.uid.id)
-            ref1 = User.objects.filter(uid=refid).query
-            print("ref1",ref1)
             ref = User.objects.filter(uid=refid).first()
         else:
             ref = None
         if ref:
             request.session['refid'] = ref.id
+        #print("CHC-request.session ",request.session)
         if 'msisdn' in request.session:
-            print(request.session['msisdn'])
+            print("CHC-msisdn ",request.session['msisdn'])
             usermob = request.session['msisdn']
             do_register(None, request, usermob, SubscriptionPlan.FREE)
             #return render(request, 'register2.html', {'wifi':False, 'refid':refid, 'msisdn':request.session['msisdn']})
@@ -407,8 +406,8 @@ def test_register_view(request):
         return render(request, 'register2.html', {'wifi':False, 'refid':refid, 'msisdn':request.session['msisdn']})
     else:
         return render(request, 'register2.html', {'wifi':False, 'refid':refid, 'msisdn':'DummyNumberHere'})
-    
-    
+      
+
 def waiting_view(request):
     # print('user_id' in request.session)
     if not 'user_id' in request.session:
@@ -449,13 +448,14 @@ def clear_session_view(request):
             request.COOKIES['logged_out'] = datetime.datetime.now().isoformat()
     return redirect('/register')
 
+
 def new_register_view(request):
     
     if request.user and request.user.is_authenticated or ('user_id' in request.session and 'renewing' not in request.session):
-        return redirect('/')
+       return redirect('/')
     elif 'headeren' not in request.session and request.is_secure() and 'msisdn' not in request.session:
         gaga = request.build_absolute_uri().replace('https', 'http')
-        # return redirect(gaga)
+        return redirect(gaga)
     else :
         refid = request.GET.get('referrer')
         ref = User.objects.filter(uid=refid).first()
@@ -478,7 +478,6 @@ def header_view(request):
 def faq_view(request):
     return render(request, 'FAQ.html', {})
 
-
 def adtest_view(request):
     return render(request, 'ad_test.html', {})
 
@@ -493,7 +492,7 @@ def privacy_view(request):
 def disclaimer_view(request):
     return render(request, 'disclaimer.html', {})
 
-
+          
 def html5_game_view(request, game):
     try:
         html5_game = HTML5Game.objects.filter(
@@ -509,7 +508,6 @@ def firebase_sw_view(request):
     return HttpResponse("""
         importScripts('https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js');
         importScripts('https://www.gstatic.com/firebasejs/9.17.1/firebase-messaging-compat.js');
-        importScripts('https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics-compat.js');
 
         firebase.initializeApp({
             apiKey: "AIzaSyClFi6oYdwKrbbTYBSNRdbYmLXJ4uR-vHI",
@@ -522,16 +520,16 @@ def firebase_sw_view(request):
         });
 
         const messaging = firebase.messaging();
-       
+
     """, status=200, content_type='application/javascript')
 
 
-def view_404(request, exception=None): 
+def view_404(request, exception=None):
     return redirect('/')
 
 def view_403(request, exception=None): 
     return redirect('/admin')
-
+    
 def report_prize_view(request):
     return render(request, 'report_prize.html', {})
 
@@ -552,7 +550,3 @@ def report_generalreport_view(request):
 
 def report_redeemedprizes_view(request):
     return render(request, 'report_redeemedprizes.html', {})
-
-# def error_403(request, exception):
-#         return render(request,'403.html') 
-

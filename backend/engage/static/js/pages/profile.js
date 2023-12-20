@@ -154,7 +154,7 @@ function load_friends(pg) {
                             </div>
                             <div class="btns">
                                 <a href="/profile/${i && i.friend ? i.friend.uid : ''}" class="btn2 flat">Check Profile</a>
-                                <a href='' class="btn2 flat send-coins-btn">`+send_coins+`</a>
+                                <a class="btn2 flat send-coins-btn">`+send_coins+`</a>
                             </div>
                         </div>
                     </li>

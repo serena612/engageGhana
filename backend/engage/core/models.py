@@ -155,6 +155,7 @@ class HTML5Game(TranslatableTimeStampedModel): #TimeStampedModel
     image = models.ImageField(upload_to='html5_games/')
     description = RichTextField(blank=True, null=True)
     regions = models.ManyToManyField('operator.Region')
+    include_inlanding_page = models.BooleanField(default=False,verbose_name="Include in landing page")
 
     def __str__(self):
         return self.game

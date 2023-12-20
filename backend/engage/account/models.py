@@ -40,20 +40,20 @@ class PhonyNumberField(models.CharField):
         
         cleaned_data = super().clean(value, *args, **kwargs)
         subdata = cleaned_data
-        prefs1 = [703, 704, 706, 803, 806, 810, 813, 814, 816, 903, 906,913,916, 102] # added 102 exception
+        prefs1 = [703, 704, 706, 803, 806, 810, 813, 814, 816, 903, 906,913,916, 102,54] # added 102 exception
         prefs2 = [7025, 7026]
-        if len(cleaned_data)==15 and cleaned_data.startswith("00"):
+        if len(cleaned_data)==14 and cleaned_data.startswith("00"):
             cleaned_data = cleaned_data[2:]
-        elif len(cleaned_data)==14 and cleaned_data.startswith("+"):
+        elif len(cleaned_data)==13 and cleaned_data.startswith("+"):
             cleaned_data = cleaned_data[1:]
-        if len(cleaned_data) == 13 and cleaned_data.startswith("234"):
+        if len(cleaned_data) == 12 and cleaned_data.startswith("233"):
             cleaned_data = cleaned_data[3:]
-        elif len(cleaned_data)==11 and cleaned_data.startswith("0"):
+        elif len(cleaned_data)==10 and cleaned_data.startswith("0"):
             cleaned_data = cleaned_data[1:]
-        if len(cleaned_data)==10:
+        if len(cleaned_data)==9:
             if int(cleaned_data[0:3]) in prefs1 or int(cleaned_data[0:4]) in prefs2:
                 print("Valid Number passing through")
-                return '234'+cleaned_data
+                return '233'+cleaned_data
     
         raise ValidationError(
             _('%(subdata)s is not a valid MTN phone number!'),
