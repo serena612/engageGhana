@@ -1265,8 +1265,10 @@ $(function () {
 });
 
 function openG(gameName){ 
+    $('#formgameid').attr('action', 'https://games.engagegh.com/games/Get');
     $("#g").val(gameName);
-    $('#btn-form-submit').click(); 
+    $("#t").val();
+    $('#btn-form-submit').click();
 }
 
 

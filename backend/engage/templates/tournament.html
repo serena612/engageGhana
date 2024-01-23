@@ -10,7 +10,10 @@
 
         var tournament_slug = '{{ tournament.slug }}'
         var game_slug = '{{ tournament.game.slug }}'
+        var game_name = '{{ tournament.game.name }}'
         var tournament_id = '{{ tournament.id }}'
+        console.log ('tournament_id',tournament_id)
+        var user_username = '{{ user.username }}'
         var pay_fee_url = "{% url 'orders-pay-fee' %}";
     </script>
     <script src="{% static 'js/pages/tournament.js' %}"></script>
@@ -153,23 +156,43 @@ if (timeleft < 0) {
 
                         <li>
                             {% if 'HTML5' in tournament.game.slug %}
-                                <a href="#leaderboard" data-id="#leaderboard-box"
-                                >{% translate 'Leaderboard' %}</a>
+                                
+                                <a href="#leaderboard" data-id="#leaderboard-box" id="leaderboard-button">
+                                    {% translate 'Leaderboard' %}
+                                </a>
+
+                                <script>
+                                    $(document).ready(function () {
+                                        $('#leaderboard-button').on('click', function () {
+                                            fetchLeaderboard();
+                                        });
+
+                                    });
+
+                                </script>
+
+                                <div id="result-container"></div>
 
                                 <!-- <a id="practice" href="{{ tournament.leader_board_link }}" target="_blank">
                                 {% translate 'Leaderboard' %} -->
                             {% else %}
-                                <a
-                                    id="practice"
-                                    href=""
-                                    data-link-android="{{ tournament.game.android_link }}"
-                                    data-link-ios="{{ tournament.game.ios_link }}"
-                                    data-link-pc="{{ tournament.game.pc_link }}"
-                                    target="_blank">
-                                {% translate 'Practice' %}
-                            {% endif %}</a>
-                        </li>
+                            {% if tournament.leader_board_link %}
+                            <a id="practice" href="{{ tournament.leader_board_link }}" target="_blank">
+                                {% translate 'Leaderboard' %} 
+                            {% else %}
 
+                            <a id="practice" href="{% if tournament.leader_board_link %}{{ tournament.leader_board_link }}{% endif %}"
+                                data-link-android="{{ tournament.game.android_link }}"
+                                data-link-ios="{{ tournament.game.ios_link }}"
+                                data-link-pc="{{ tournament.game.pc_link }}"
+                                target="_blank">
+                            {% translate 'Practice' %}
+                            {% endif %}
+                            {% endif %}
+
+
+                                </a>
+                        </li>
                         <li id="joinStatus">
                         {% if participant %}
                             {% if participant.is_waiting_list %}
@@ -182,18 +205,20 @@ if (timeleft < 0) {
                                 {% else %} 
                                     {% if 'HTML5' in tournament.game.slug %}
                                         {% if tournament.started_on  and  tournament.end_date > currentDate  and not tournament.closed_on %}
-                                            <a data-toggle="modal" data-target="#user-game-modal" id="play-now-link" onclick="openG('{{ tournament.game.slug }}', '{{ tournament_id }}')">
+                                       <!-- onclick="openG('{{ tournament.game.name }}', '{{ tournament_id }}')" -->
+                                            <a data-toggle="modal" data-target="#user-game-modal" id="play-now-link" class="playnow_btn">
                                                 Play now
                                             </a>
-                                            <script>
+                                           <!-- <script>
                                                 function openG(gameName, tournament_id) {
-                                                    // Use the 'target' variable as needed
+
+                                                    $('#formgameid').attr('action', 'https://games.engagegh.com/games/tournament/Get');
                                                     $("#g").val(gameName);
-                                                    $("#id").val(tournament_id);
-                                                    // Additional logic if needed
+                                                    $("#t").val(tournament_id);
+
                                                     $('#btn-form-submit').click();
                                                 }
-                                            </script>
+                                            </script> -->
                                         {% else %}
                                             <a style="cursor: default">{% translate 'joined' %} <img
                                                 src="/static/img/check.svg"
@@ -388,47 +413,6 @@ if (timeleft < 0) {
                 </ul>
             </div>
         </section>
-
-      
-
-        <section class="tab-section page-tab-content p-content" id="leaderboard-box">
-            <div class="profile-contain">
-                <div class="left">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="tour-details-box">
-                                <div class="left2"></div>
-                                <div class="right2">
-                                    <div>
-                                        <div class="widget-3 widget">
-                                            <div class="title-wrapper type-2">
-                                                <h3 class="box-title">
-                                                    {% translate 'Tournament Winners Details' %}
-                                                </h3>
-                                                <div class="clear"></div>
-                                            </div>
-        
-                                            <div class="wcontainer p-container">
-                                                <table class="table-1">
-                                                    <tr>
-                                                        <td width="150">{% translate 'User' %}</td>
-                                                        <td class="font-weight-normal">{{ tournament.participant_id }}</td>
-                                                        <td width="150">{% translate 'Rank' %}</td>
-                                                        
-                                                    </tr>
-                                                </table>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            
-        </section>
-        
-
         {% comment %} <section class="side-friends">
             
             {% if user.is_authenticated %}
@@ -476,6 +460,44 @@ if (timeleft < 0) {
                 </ul>
             {% endif %}
         </section> {% endcomment %}
+
+        <section class="tab-section page-tab-content p-content" id="leaderboard-box" style="display: none;">
+            <div class="profile-contain">
+                <div class="left">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="tour-details-box">
+                                <div class="left2"></div>
+                                <div class="right2">
+                                    <div>
+                                        <div class="widget-3 widget">
+                                            <div class="title-wrapper type-2">
+                                                <h3 class="box-title">
+                                                    {% translate 'Tournament Winners Details' %}
+                                                </h3>
+                                                <div class="clear"></div>
+                                            </div>
+        
+                                            <div class="wcontainer p-container">
+                                                <table class="table-1 scoreList" >
+                                                    <tr>
+                                                        <td width="150">{% translate 'User' %}</td>
+                                                        <td width="150">{% translate 'Score' %}</td>
+                                                        <td width="150">{% translate 'Rank' %}</td>
+                                                    </tr>
+                                        
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </div>
 {% endblock %}
 
@@ -510,7 +532,16 @@ if (timeleft < 0) {
                     {% endif %}  
                        
                 {% elif  participant and  tournament.started_on %}
-                    {% if 'HTML5' not in tournament.game.slug %}
+                {% if 'html5' in tournament.game.slug|lower %}
+                        {% if user.subscription == 'free' or not user.is_billed %}
+                        <div class="modal-content" style="text-align: center; background-color: #1D0F26; border-radius: 10px;"> 
+                            <div class="modal-body" style="padding-top: 47px; width: 84%; margin: 0px auto 6px;">                    
+                                <div style="color:#FF0090">{% translate 'SUBSCRIBERS ONLY!' %}</div>
+                                <div style="margin-bottom: 20px;color: #FFF;font-size: 0.8rem;">{% translate 'PLEASE UPGRADE FROM THE PACKAGE TO N50 PACKAGE TO BE ABLE TO JOIN TOURNAMENTS. TO UPGRADE PLEASE CLICK ON THE BUTTON BELOW.' %}</div>                    
+                                <div class="btn_upgrade" style="cursor: pointer; background-color: #FF0090; height: 44px; padding-top: 10px; font-weight: 800; border-radius: 4px; color: #181022; text-align: center; max-width: 100%; margin: 0px auto 20px;">{% translate 'UPGRADE PACKAGE' %}</div>                   
+                            </div>
+                        </div>
+                        {% else %}
                     <div class="modal-header">
                         <h3 class="box-title">{% translate 'Good Luck!' %}</h3>
                         <div class="clear"></div>
@@ -521,7 +552,17 @@ if (timeleft < 0) {
                         </div>
                     </div>    
                     {% endif %}  
-
+                    {% else %}
+                    <div class="modal-header">
+                        <h3 class="box-title">{% translate 'Good Luck!' %}</h3>
+                        <div class="clear"></div>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row" style="margin: auto">
+                            <p>{% translate 'This tournament is ongoing, enjoy the game. Good Luck!!' %}</p>
+                        </div>
+                    </div>   
+                    {%endif%}
                     {% elif  not participant and  tournament.close_date < currentDate  %}
                     <div class="modal-header">
                         <h3 class="box-title">{% translate 'Cannot join!' %}</h3>

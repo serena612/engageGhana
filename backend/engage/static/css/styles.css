@@ -7457,7 +7457,10 @@ margin-top: 13px;}
     margin-right: 1px!important;
     margin-left: 4px;
 }
-
-
-
 }
+
+.td_user  i{    float: left;
+  margin-right: 9px;
+  margin-top: 4px;
+}
+.td_user div{    float: left;}

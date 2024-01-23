@@ -380,6 +380,7 @@ function hashchanged() {
                 var friends_list_reject = '{% url "friendlist-reject-friend-request" %}';
                 var user_uid = '{{ user.uid }}'
                 var upgrade_subscription = "{% url 'user-upgrade-subscription' 'user_uid' %}";
+                var leaderboard_results = "{% url 'user-leaderboard-results' 'user_uid' %}";
                 var check_user_status = "{% url 'user-check-userstatus' 'user_uid' %}"; 
                 var update_log = "{% url 'user-update-log' 'user_uid' %}"; 
                 var check_usercoin = "{% url 'user-check-usercoin' 'user_uid' %}"; 
@@ -574,12 +575,14 @@ function hashchanged() {
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=G-C0XVDBF16H"
         height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
-    <form action="http://games.engagegh.com/games/Get" method="POST" target="_blank" style="display:none;">
+    <form action="" method="POST" target="_blank" style="display:none;" id = "formgameid" name = "formgameid">
         <input type="hidden" id="m" name="m" value="{{encrypted_data}}"/>
         <input type="hidden" id="g" name="g"/>
-        <input type="hidden" id="id" name="id"/>
+        <input type="hidden" id="t" name="t"/>
         <input type="submit" id="btn-form-submit"/>
     </form>
+
+
 
 
 <nav class="hih">

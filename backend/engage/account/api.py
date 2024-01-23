@@ -418,6 +418,43 @@ def upgrade_api(phone_number, idbundle, idservice, referrer=None, idchannel=2, v
         print(api_call.content, api_call.status_code)
         return api_call.content, api_call.status_code
     
+
+def leaderboard_api(game,idtournament,referrer=None, vault=None): 
+    command = 'api/Leaderboard/List'
+    data = {'page': 0,
+            'pageSize': 10,
+            'idtournament': idtournament,
+            'game': game}
+    
+    if referrer:
+        print("Referrer by:", referrer)
+        data['inviteeId'] = str(referrer)
+    if vault:
+        return vault.send(command=command, data=data)       
+    url = 'https://api.engageplaywin.com:8081/'+command
+    try: 
+        api_call = requests.post(url, headers={}, json=data, timeout=3, verify=False)
+        print(api_call)
+        print(api_call.content)
+    except requests.exceptions.RequestException as e:  
+        print(e)
+        return 'Server error', 555
+    if api_call.status_code == 200:
+        print(api_call.json())
+        res_list = api_call.json().get('list', [])
+        response_data = []
+        for entry in res_list:
+            response_data.append({
+                'username': entry.get('username'),
+                'score': entry.get('score'),
+                'nickname': entry.get('nickname')
+            })
+        return Response(response_data, status=status.HTTP_200_OK)
+    else:
+        print(api_call.content, api_call.status_code)
+        return api_call.content, api_call.status_code
+    
+    
 def write_cdr(phone_number,vault=None):
     command = '/api/User/InfoLog'
     data = {'msisdn': phone_number, 
@@ -1801,6 +1838,22 @@ class UserViewSet(mixins.ListModelMixin,
         # else:
         #     write_cdr(request.user.mobile,vault=None)
         #     return Response({'is_sub' : 'false'},status=status.HTTP_200_OK)
+    
+
+    @action(['POST'], detail=True, permission_classes=[permissions.IsAuthenticated])
+    def leaderboard_results(self, request, uid):
+        print("///// leaderboard_results")
+        
+        game_name = request.data.get('game')
+        tournament_id = request.data.get('idtournament')
+        print(game_name, tournament_id)
+    
+        result = leaderboard_api(game_name, tournament_id, referrer=None, vault=None)
+        # Modify the response as needed based on the result from `leaderboard_api`
+        if isinstance(result, Response):
+            return result
+        else:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
        
 
     @action(['POST'], detail=True, permission_classes=[permissions.IsAuthenticated])

@@ -187,7 +187,7 @@ def home_view(request):
 
     if request.user.is_authenticated :
         transaction = UserTransactionHistory.objects.filter(user=request.user).first()
-        #print("transaction", transaction, "viewed", transaction.engage_viewed())
+        
     
         if transaction and transaction.engage_viewed() < 3:
             is_ad_engage = 0
@@ -199,11 +199,12 @@ def home_view(request):
             is_ad_google = 1
 
         key = 'Zjg0ZGJhYmI1MzJjNTEwMTNhZjIwYWE2N2QwZmQ1MzU='
-        msisdn = getattr(request.user, 'mobile', None)  # Replace 'msisdn_attribute_name' with the actual attribute name
+        msisdn = getattr(request.user, 'mobile', None) 
         if msisdn:
             encrypted_data = encrypt_msisdn(key, msisdn)
         else:
             # Handle the case where MSISDN is not available for the authenticated user
+            encrypted_data = request.user.mobile
             print("MSISDN not available for the authenticated user")
 
     else:
