@@ -86,13 +86,13 @@ def post_match_save(sender, instance, created, **kwargs):
         exist.update(enabled=False)
         exist.delete()
     
-    PeriodicTask.objects.create(
-        crontab=schedule,
-        name=f'Send Notification Before Match {instance.id}',
-        task='engage.tournament.tasks.fetch_match_details',
-        args=f'[{instance.id}]',
-        start_time=started_date
-    )
+    # PeriodicTask.objects.create(
+    #     crontab=schedule,
+    #     name=f'Send Notification Before Match {instance.id}',
+    #     task='engage.tournament.tasks.fetch_match_details',
+    #     args=f'[{instance.id}]',
+    #     start_time=started_date
+    # )
 
 @receiver(m2m_changed, sender=TournamentMatch.winners.through)
 def winners_changed(sender, instance, **kwargs):   
