@@ -155,7 +155,7 @@ if (timeleft < 0) {
                         </li>
 
                         <li>
-                            {% if 'HTML5' in tournament.game.slug %}
+                            {% if 'html5' in tournament.game.slug|lower %}
                                 
                                 <a href="#leaderboard" data-id="#leaderboard-box" id="leaderboard-button">
                                     {% translate 'Leaderboard' %}
@@ -203,7 +203,7 @@ if (timeleft < 0) {
                                     <a class="disabled" style="pointer-events:none">{% translate 'Expired' %} </a>
                                 
                                 {% else %} 
-                                    {% if 'HTML5' in tournament.game.slug %}
+                                  {% if 'html5' in tournament.game.slug|lower %}
                                         {% if tournament.started_on  and  tournament.end_date > currentDate  and not tournament.closed_on %}
                                        <!-- onclick="openG('{{ tournament.game.name }}', '{{ tournament_id }}')" -->
                                             <a data-toggle="modal" data-target="#user-game-modal" id="play-now-link" class="playnow_btn">
@@ -245,11 +245,17 @@ if (timeleft < 0) {
                                     {% if tournament.end_date < currentDate or tournament.closed_on %}
                                         <a class="disabled" style="pointer-events:none">{% translate 'Expired' %}</a>  
                                     {% elif tournament.started_on  and  tournament.end_date > currentDate  and not tournament.closed_on %}
-                                        
-                                            <a data-toggle="modal" data-target="#user-game-modal">
+                                        {% if 'HTML5' not in tournament.game.slug %}   
+                                            <a data-toggle="modal">
                                                 {% translate 'In progress' %}
                                                 <img src="/static/img/check.svg" class="joined-in" alt="">
+                                                
                                             </a>
+                                        {% else %}
+                                        <a  class="register_btn">{% translate 'Register' %}</a>
+                                        
+                                         {% endif %}    
+
                                     {% elif tournament.close_date < currentDate %}
                                         <a data-toggle="modal"
                                         data-target="#user-game-modal"> {% translate 'Closed' %}</a>      
@@ -266,7 +272,7 @@ if (timeleft < 0) {
                                     {% elif tournament.started_on and tournament.end_date > currentDate and not tournament.closed_on%}
                                         <a class="join-now"
                                        data-toggle="modal"
-                                       data-target="#login-modal">{% translate 'IN PROGRESS' %}<img src="/static/img/check.svg" class="joined-in" alt=""></a>
+                                       >{% translate 'IN PROGRESS' %}<img src="/static/img/check.svg" class="joined-in" alt=""></a>
                                     {% elif tournament.close_date <= currentDate %}
                                          <a data-toggle="modal"
                                          data-target="#user-game-modal">{% translate 'Closed' %}</a>  
@@ -473,7 +479,7 @@ if (timeleft < 0) {
                                         <div class="widget-3 widget">
                                             <div class="title-wrapper type-2">
                                                 <h3 class="box-title">
-                                                    {% translate 'Tournament Winners Details' %}
+                                                    {% translate 'LEADERBOARD' %}
                                                 </h3>
                                                 <div class="clear"></div>
                                             </div>

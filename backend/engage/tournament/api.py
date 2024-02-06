@@ -267,7 +267,7 @@ class TournamentViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin,
             game=tournament.game
         ).first()
 
-        if ("html5" or "HTML5") not in tournament.slug:
+        if "html5" not in tournament.game.slug.lower() and "HTML5" not in tournament.game.slug:
             if not linked_account:
                 raise GameAccountUnavailable()
 
